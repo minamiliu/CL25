@@ -22,7 +22,7 @@
 //============================================
 //構造体定義
 //============================================
-//敵クラス
+
 class CScene2D : public CScene
 {
 public:
@@ -35,16 +35,21 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+	
+	HRESULT Load(LPCSTR strFileName);
+	void BindTexture( LPDIRECT3DTEXTURE9 pTexture);
 
 	void SetPosition(D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void);
 
 	static CScene2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
 
+
 private:
 
 	LPDIRECT3DTEXTURE9		m_pTexture;		// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;		// 頂点バッファへのポインタ
+	bool m_bLoadTexture;					// テクスチャを読み込んだかどうか
 
 	D3DXVECTOR3			m_pos;				// ポリゴンの位置
 	D3DXVECTOR3			m_size;				// ポリゴンのサイズ

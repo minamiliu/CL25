@@ -25,11 +25,8 @@
 
 #define NUM_VERTEX (4)
 #define NUM_POLYGON (2)
-#define POLYGON_POS_X	(SCREEN_WIDTH/2)//ポリゴンの左上X
-#define POLYGON_POS_Y	(SCREEN_HEIGHT/2)//ポリゴンの左上Y
-#define POLYGON_SIZE_X	(300)//ポリゴンのSIZE X
-#define POLYGON_SIZE_Y	(300)//ポリゴンのSIZE Y
-#define POLYGON_TEXTURENAME "data/TEXTURE/player000.png"
+
+#define TEXTURENAME "data/TEXTURE/XXX.png"
 
 //=============================================================================
 // 構造体定義
@@ -51,6 +48,7 @@ CScene2D::CScene2D()
 	m_pTexture = NULL;		// テクスチャへのポインタ
 	m_pVtxBuff = NULL;		// 頂点バッファへのポインタ
 	m_pos = D3DXVECTOR3( 0.0f, 0.0f, 0.0f);			// ポリゴンの位置
+	m_bLoadTexture = false;
 }
 
 //=============================================================================
@@ -78,9 +76,7 @@ HRESULT CScene2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	// ポリゴンの情報を設置
 	m_pos = pos;
 	m_size = size;
-
-	// テクスチャの生成
-	D3DXCreateTextureFromFile( pDevice, POLYGON_TEXTURENAME, &m_pTexture);
+	m_bLoadTexture = false;
 
 	// 頂点バッファの生成
 	if(FAILED(pDevice->CreateVertexBuffer(
@@ -145,7 +141,7 @@ void CScene2D::Uninit(void)
 	}
 
 	// テクスチャの破棄
-	if(m_pTexture != NULL)
+	if(m_pTexture != NULL && m_bLoadTexture == true)
 	{
 		m_pTexture->Release();
 		m_pTexture = NULL;
@@ -197,10 +193,16 @@ CScene2D *CScene2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	CScene2D *pScene2D;
 	pScene2D = new CScene2D;
 	pScene2D->Init(pos, size);
-	
+
+	//テクスチャの読み込み
+	pScene2D->Load( TEXTURENAME);
+
 	return pScene2D;
 }
 
+//=============================================================================
+// ポリゴンの座標設置
+//=============================================================================
 void CScene2D::SetPosition(D3DXVECTOR3 pos)
 {
 	m_pos = pos;
@@ -220,7 +222,38 @@ void CScene2D::SetPosition(D3DXVECTOR3 pos)
 	m_pVtxBuff->Unlock();
 }
 
+//=============================================================================
+// ポリゴンの座標取得
+//=============================================================================
 D3DXVECTOR3 CScene2D::GetPosition(void)
 {
 	return m_pos;
+}
+
+//=============================================================================
+// ポリゴンのテクスチャを読み込む
+//=============================================================================
+HRESULT CScene2D::Load(LPCSTR strFileName)
+{
+	if( m_pTexture == NULL)
+	{
+		LPDIRECT3DDEVICE9 pDevice;
+		pDevice = CManager::GetRenderer()->GetDevice();
+
+		// テクスチャの読み込み
+		D3DXCreateTextureFromFile( pDevice, strFileName, &m_pTexture);
+
+		// テクスチャの読み込みフラグ
+		m_bLoadTexture = true;
+	}
+
+	return S_OK;
+}
+
+//=============================================================================
+// ポリゴンのテクスチャを割り当てる
+//=============================================================================
+void CScene2D::BindTexture( LPDIRECT3DTEXTURE9 pTexture)
+{
+	m_pTexture = pTexture;
 }

@@ -14,11 +14,12 @@
 #include "manager.h"
 #include "input.h"
 #include "player2D.h"
+#include "bullet2D.h"
 
 //============================================
 // マクロ定義
 //============================================
-
+#define TEXTURENAME "data/TEXTURE/player000.png"
 
 //=============================================================================
 // 構造体定義
@@ -69,8 +70,10 @@ void CPlayer2D::Uninit(void)
 void CPlayer2D::Update(void)
 {
 	CInputKeyboard *pInputKeyboard = CManager::GetInputKeyboard();
+	CInputMouse *pInputMouse = CManager::GetInputMouse();
 	D3DXVECTOR3 pos = CPlayer2D::GetPosition();
 
+	//移動
 	if(pInputKeyboard->GetKeyPress(DIK_W))
 	{
 		pos.y -= 5.0f;
@@ -91,18 +94,23 @@ void CPlayer2D::Update(void)
 		pos.x += 5.0f;
 		SetPosition(pos);
 	}
-
-	if(CManager::GetInputMouse()->GetMouseLeftPress())
+	
+	int mouseMoveX = pInputMouse->GetMouseAxisX();
+	if( mouseMoveX != 0)
 	{
-		pos.x += CManager::GetInputMouse()->GetMouseAxisX() % 100;
-		pos.y += CManager::GetInputMouse()->GetMouseAxisY() % 100;
+		pos.x += mouseMoveX;
 		SetPosition(pos);
 	}
 
-	if(CManager::GetInputMouse()->GetMouseLeftRelease())
+
+	//攻撃
+	if(pInputKeyboard->GetKeyTrigger(DIK_SPACE))
 	{
-		pos.x += 100.0f;
-		SetPosition(pos);
+		CBullet2D::Create(pos, D3DXVECTOR3( 20.0f, 20.0f, 0.0f));
+	}
+	if(pInputMouse->GetMouseLeftTrigger())
+	{
+		CBullet2D::Create(pos, D3DXVECTOR3( 20.0f, 20.0f, 0.0f));
 	}
 
 	CScene2D::Update();
@@ -124,6 +132,9 @@ CPlayer2D *CPlayer2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	CPlayer2D *pPlayer2D;
 	pPlayer2D = new CPlayer2D;
 	pPlayer2D->Init(pos, size);
+
+	//テクスチャの割り当て
+	pPlayer2D->Load( TEXTURENAME);
 	
 	return pPlayer2D;
 }
