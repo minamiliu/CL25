@@ -15,6 +15,7 @@
 #include "renderer.h"
 #include "input.h"
 #include "bullet2D.h"
+#include "explosion2D.h"
 
 //============================================
 // É}ÉNÉçíËã`
@@ -84,8 +85,9 @@ void CBullet2D::Update(void)
 	pos += m_move;
 	CScene2D::SetPosition(pos);
 
-	if(pos.y < 0.0f)
+	if(pos.y < 50.0f)
 	{
+		CExplosion2D::Create(pos, D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 		this->Uninit();
 	}
 }
@@ -142,7 +144,6 @@ void CBullet2D::Unload(void)
 	if( m_pTexture != NULL)
 	{
 		m_pTexture->Release();
-		delete m_pTexture;
 		m_pTexture = NULL;
 	}
 }

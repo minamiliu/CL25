@@ -32,6 +32,7 @@ public:
 
 	HRESULT Init(void);
 	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
@@ -41,6 +42,8 @@ public:
 
 	void SetPosition(D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void);
+
+	void ChangeTextureAnime(int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide); //アニメーション
 
 	static CScene2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
 

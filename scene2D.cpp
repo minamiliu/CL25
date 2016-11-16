@@ -31,7 +31,6 @@
 //=============================================================================
 // 構造体定義
 //=============================================================================
-// 上記頂点フォーマットに合わせた構造体を定義
 typedef struct
 {
 	D3DXVECTOR3 pos;	// 頂点座標
@@ -119,6 +118,27 @@ HRESULT CScene2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	pVtx[1].tex = D3DXVECTOR2(1.0F, 0.0F);
 	pVtx[2].tex = D3DXVECTOR2(0.0F, 1.0F);
 	pVtx[3].tex = D3DXVECTOR2(1.0F, 1.0F);
+
+	m_pVtxBuff->Unlock();
+
+	return S_OK;
+}
+
+HRESULT CScene2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
+{
+	Init(pos, size);
+
+	// 頂点情報を設定
+	VERTEX_2D *pVtx;
+
+	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
+
+	//テクスチャ座標指定
+	pVtx[0].tex = D3DXVECTOR2( ptnSize.x * 0.0f, ptnSize.y * 0.0f);
+	pVtx[1].tex = D3DXVECTOR2( ptnSize.x * 1.0f, ptnSize.y * 0.0f);
+	pVtx[2].tex = D3DXVECTOR2( ptnSize.x * 0.0f, ptnSize.y * 1.0f);
+	pVtx[3].tex = D3DXVECTOR2( ptnSize.x * 1.0f, ptnSize.y * 1.0f);
 
 	m_pVtxBuff->Unlock();
 
@@ -256,4 +276,33 @@ HRESULT CScene2D::Load(LPCSTR strFileName)
 void CScene2D::BindTexture( LPDIRECT3DTEXTURE9 pTexture)
 {
 	m_pTexture = pTexture;
+}
+
+//=============================================================================
+//
+//=============================================================================
+void CScene2D::ChangeTextureAnime(int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide)
+{
+	//頂点バッファの中身を埋める
+	VERTEX_2D *pVtx;
+	float fPosXLeft, fPosXRight;
+	float fPosYUp, fPosYDown;
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// テクスチャ座標の設定
+	fPosXLeft	= ptnSize.x * (nPatternAnim % (int)ptnDivide.x);
+	fPosXRight	= ptnSize.x * (nPatternAnim % (int)ptnDivide.x + 1);
+	fPosYUp		= ptnSize.y * (nPatternAnim / (int)ptnDivide.x);
+	fPosYDown	= ptnSize.y * (nPatternAnim / (int)ptnDivide.x + 1);
+
+
+	pVtx[0].tex = D3DXVECTOR2( fPosXLeft, fPosYUp );
+	pVtx[1].tex = D3DXVECTOR2( fPosXRight, fPosYUp );
+	pVtx[2].tex = D3DXVECTOR2( fPosXLeft, fPosYDown );
+	pVtx[3].tex = D3DXVECTOR2( fPosXRight, fPosYDown );
+
+	// 頂点データをアンロックする
+	m_pVtxBuff->Unlock();
 }
