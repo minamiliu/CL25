@@ -109,3 +109,27 @@ void CScene::Release(void)
 		m_nNumScene--;
 	}	
 }
+
+//============================================
+//オブジェクトを設定
+//============================================
+void CScene::SetObjType(OBJTYPE type)
+{
+	m_objType = type;
+}
+
+//============================================
+//オブジェクトを取得
+//============================================
+CScene::OBJTYPE CScene::GetObjType(void)
+{
+	return m_objType;
+}
+
+//============================================
+//オブジェクトのIDを取得
+//============================================
+CScene *CScene::GetScene(int nIdxScene)
+{
+	return m_apScene[nIdxScene];
+}

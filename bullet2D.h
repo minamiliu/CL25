@@ -43,6 +43,7 @@ private:
 
 	static LPDIRECT3DTEXTURE9 m_pTexture;
 	D3DXVECTOR3 m_move;
+	int m_nCntFrame;
 };
 
 #endif

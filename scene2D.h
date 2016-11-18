@@ -42,6 +42,7 @@ public:
 
 	void SetPosition(D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void);
+	D3DXVECTOR3 GetSize(void);
 
 	void ChangeTextureAnime(int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide); //アニメーション
 

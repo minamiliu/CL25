@@ -55,8 +55,10 @@ CBullet2D::~CBullet2D()
 HRESULT CBullet2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 {
 	CScene2D::Init(pos, size);
+	SetObjType( CScene::OBJTYPE_BULLET);
 
 	m_move = D3DXVECTOR3( 0.0f, -5.0f, 0.0f);
+	m_nCntFrame = 0;
 
 	return S_OK;
 }
@@ -85,10 +87,45 @@ void CBullet2D::Update(void)
 	pos += m_move;
 	CScene2D::SetPosition(pos);
 
-	if(pos.y < 50.0f)
+	//’e‚ªÁ‚¦‚éˆ—
+	m_nCntFrame++;
+	if( m_nCntFrame > 120)
 	{
 		CExplosion2D::Create(pos, D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 		this->Uninit();
+		return;
+	}
+
+	for( int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
+	{
+		CScene *pScene;
+		pScene = CScene::GetScene( nCntScene);
+		
+		if( pScene != NULL)
+		{
+			CScene::OBJTYPE type;
+			type = pScene->GetObjType();
+
+			if( type == CScene::OBJTYPE_ENEMY)
+			{
+				D3DXVECTOR3 posEnemy, posBullet;
+				posEnemy = pScene->GetPosition();
+				posBullet = this->GetPosition();
+
+				if( sqrt( (posEnemy.x - posBullet.x)*(posEnemy.x - posBullet.x) + (posEnemy.y - posBullet.y)*(posEnemy.y - posBullet.y)  ) < 50.0f)
+				{
+					CExplosion2D::Create(pos, D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+
+					//“G‚Ì”jŠü
+ 					pScene->Uninit();
+
+					//’e(Ž©•ª)‚Ì”jŠü
+					this->Uninit();
+
+					return;
+				}
+			}
+		}
 	}
 }
 

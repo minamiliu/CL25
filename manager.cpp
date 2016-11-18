@@ -16,6 +16,7 @@
 #include "scene2D.h"
 #include "input.h"
 #include "player2D.h"
+#include "enemy2D.h"
 
 //============================================
 // マクロ定義
@@ -62,6 +63,12 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 
 	//オブジェクトの生成(2Dポリゴン)
 	CPlayer2D::Create(D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
+
+	for(int cntEnemy = 0; cntEnemy < 5; cntEnemy++)
+	{
+		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
+	}
+	
 
 	return S_OK;
 }

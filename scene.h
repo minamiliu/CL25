@@ -22,6 +22,15 @@
 class CScene
 {
 public:
+	typedef enum
+	{
+		OBJTYPE_NONE = 0,
+		OBJTYPE_PLAYER,
+		OBJTYPE_ENEMY,
+		OBJTYPE_BULLET,
+		OBJTYPE_EXPLOSION,
+		OBJTYPE_MAX,
+	}OBJTYPE;
 
 	CScene();
 	virtual ~CScene();
@@ -35,6 +44,13 @@ public:
 	static void DrawAll(void);
 	static void ReleaseAll(void);
 
+	virtual D3DXVECTOR3 GetPosition(void) = 0;
+
+	void SetObjType(OBJTYPE type);
+	OBJTYPE GetObjType(void);
+	
+	static CScene *GetScene(int nIdxScene);
+
 protected:
 	
 	void Release(void);
@@ -44,6 +60,7 @@ private:
 	static CScene *m_apScene[MAX_SCENE];
 	static int m_nNumScene;
 	int m_nID;
+	OBJTYPE m_objType;
 };
 
 #endif

@@ -49,6 +49,8 @@ CPlayer2D::~CPlayer2D()
 HRESULT CPlayer2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 {
 	CScene2D::Init(pos, size);
+	SetObjType( CScene::OBJTYPE_PLAYER);
+
 	return S_OK;
 }
 

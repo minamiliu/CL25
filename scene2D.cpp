@@ -306,3 +306,11 @@ void CScene2D::ChangeTextureAnime(int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVEC
 	// 頂点データをアンロックする
 	m_pVtxBuff->Unlock();
 }
+
+//=============================================================================
+//
+//=============================================================================
+D3DXVECTOR3 CScene2D::GetSize(void)
+{
+	return m_size;
+}
