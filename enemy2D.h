@@ -26,6 +26,15 @@
 class CEnemy2D : public CScene2D
 {
 public:
+	typedef enum
+	{
+		TYPE_NONE = -1,
+		TYPE_000,
+		TYPE_001,
+		TYPE_002,
+		TYPE_003,
+		TYPE_MAX,
+	}TYPE;
 
 	CEnemy2D();
 	virtual ~CEnemy2D();
@@ -35,13 +44,13 @@ public:
 	void Update(void);
 	void Draw(void);
 
-	static CEnemy2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	static CEnemy2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);
 	static HRESULT Load(void);
 	static void Unload(void);
 
 private:
 
-	static LPDIRECT3DTEXTURE9 m_pTexture;
+	static LPDIRECT3DTEXTURE9 m_pTexture[TYPE_MAX];
 	D3DXVECTOR3 m_move;
 	float m_fCntAngle;
 };

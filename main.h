@@ -13,6 +13,7 @@
 #include "windows.h"
 #include "d3dx9.h"
 #include "dinput.h"
+#include "xaudio2.h"		// XAudio2関連のヘッダー
 
 //*****************************************************************************
 // ライブラリファイル

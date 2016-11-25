@@ -46,7 +46,7 @@ public:
 
 	void ChangeTextureAnime(int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide); //アニメーション
 
-	static CScene2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	static CScene2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, LPCSTR strFileName);
 
 
 private:

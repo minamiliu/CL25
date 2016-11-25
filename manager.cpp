@@ -17,10 +17,12 @@
 #include "input.h"
 #include "player2D.h"
 #include "enemy2D.h"
+#include "sound.h"
 
 //============================================
 // マクロ定義
 //============================================
+#define TEXTURE_BG "data/TEXTURE/bg100.png"
 
 //============================================
 // 静的メンバー変数の初期化
@@ -28,6 +30,7 @@
 CRenderer *CManager::m_pRenderer = NULL;
 CInputKeyboard *CManager::m_pInputKeyboard = NULL;
 CInputMouse *CManager::m_pInputMouse = NULL;
+CSound *CManager::m_pSound = NULL;
 
 //============================================
 //コンストラクタ
@@ -61,13 +64,26 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_pInputMouse = new CInputMouse;
 	m_pInputMouse->Init(hInstance, hWnd);
 
-	//オブジェクトの生成(2Dポリゴン)
+	//サウンド
+	m_pSound = new CSound;
+	m_pSound->Init( hWnd);
+	m_pSound->Play( CSound::SOUND_LABEL_BGM001);
+
+	//プレイヤー
 	CPlayer2D::Create(D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
 
+	//敵
+	CEnemy2D::Load();
 	for(int cntEnemy = 0; cntEnemy < 5; cntEnemy++)
 	{
-		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
+		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_000);
+		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 200.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_001);
+		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 300.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_002);
+		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 400.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_003);
 	}
+
+	//背景
+	CScene2D::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG);
 	
 
 	return S_OK;
@@ -97,6 +113,14 @@ void CManager::Uninit()
 		m_pInputMouse = NULL;
 	}
 
+	//サウンドの破棄
+	if( m_pRenderer != NULL)
+	{
+		m_pSound->Uninit();
+		delete m_pSound;
+		m_pSound = NULL;
+	}
+
 	//レンダラーの破棄
 	if( m_pRenderer != NULL)
 	{
@@ -119,7 +143,6 @@ void CManager::Update()
 
 	//マウスの更新処理
 	m_pInputMouse->Update();
-
 }
 
 //=============================================================================
@@ -153,4 +176,12 @@ CInputKeyboard *CManager::GetInputKeyboard(void)
 CInputMouse *CManager::GetInputMouse(void)
 {
 	return m_pInputMouse;
+}
+
+//=============================================================================
+//
+//=============================================================================
+CSound *CManager::GetSound(void)
+{
+	return m_pSound;
 }

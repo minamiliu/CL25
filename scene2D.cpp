@@ -208,14 +208,14 @@ void CScene2D::Draw(void)
 //=============================================================================
 // ポリゴンの生成処理
 //=============================================================================
-CScene2D *CScene2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
+CScene2D *CScene2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, LPCSTR strFileName)
 {
 	CScene2D *pScene2D;
 	pScene2D = new CScene2D;
 	pScene2D->Init(pos, size);
 
 	//テクスチャの読み込み
-	pScene2D->Load( TEXTURENAME);
+	pScene2D->Load( strFileName);
 
 	return pScene2D;
 }

@@ -15,6 +15,7 @@
 #include "input.h"
 #include "player2D.h"
 #include "bullet2D.h"
+#include "sound.h"
 
 //============================================
 // ƒ}ƒNƒ’è‹`
@@ -73,6 +74,7 @@ void CPlayer2D::Update(void)
 {
 	CInputKeyboard *pInputKeyboard = CManager::GetInputKeyboard();
 	CInputMouse *pInputMouse = CManager::GetInputMouse();
+	CSound *pSound = CManager::GetSound();
 	D3DXVECTOR3 pos = CPlayer2D::GetPosition();
 
 	//ˆÚ“®
@@ -109,6 +111,8 @@ void CPlayer2D::Update(void)
 	if(pInputKeyboard->GetKeyTrigger(DIK_SPACE))
 	{
 		CBullet2D::Create(pos, D3DXVECTOR3( 20.0f, 20.0f, 0.0f));
+		pSound->Play( CSound::SOUND_LABEL_SE_SHOT000);
+
 	}
 	if(pInputMouse->GetMouseLeftTrigger())
 	{

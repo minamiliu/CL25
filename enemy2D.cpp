@@ -19,12 +19,15 @@
 //============================================
 // マクロ定義
 //============================================
-#define TEXTURENAME "data/TEXTURE/enemy000.png"
+#define TEXTURE_ENEMY000 "data/TEXTURE/enemy000.png"
+#define TEXTURE_ENEMY001 "data/TEXTURE/enemy001.png"
+#define TEXTURE_ENEMY002 "data/TEXTURE/enemy002.png"
+#define TEXTURE_ENEMY003 "data/TEXTURE/enemy003.png"
 
 //============================================
 // 静的メンバー変数の初期化
 //============================================
-LPDIRECT3DTEXTURE9 CEnemy2D::m_pTexture = NULL;
+LPDIRECT3DTEXTURE9 CEnemy2D::m_pTexture[CEnemy2D::TYPE_MAX] = {};
 
 //=============================================================================
 // 構造体定義
@@ -58,6 +61,7 @@ HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	SetObjType( CScene::OBJTYPE_ENEMY);
 
 	m_move = D3DXVECTOR3( 5.0f, 0.0f, 0.0f);
+
 
 	return S_OK;
 }
@@ -112,17 +116,14 @@ void CEnemy2D::Draw(void)
 //=============================================================================
 // ポリゴンの生成処理
 //=============================================================================
-CEnemy2D *CEnemy2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
+CEnemy2D *CEnemy2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 {
 	CEnemy2D *pBullet2D;
 	pBullet2D = new CEnemy2D;
 	pBullet2D->Init(pos, size);
 
-	//テクスチャの読み込み
-	pBullet2D->Load();
-
 	//テクスチャの割り当て
-	pBullet2D->BindTexture(m_pTexture);
+	pBullet2D->BindTexture(m_pTexture[type]);
 	
 	return pBullet2D;
 }
@@ -132,14 +133,38 @@ CEnemy2D *CEnemy2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 //=============================================================================
 HRESULT CEnemy2D::Load(void)
 {
-	if( m_pTexture == NULL)
+	for(int cntType = 0; cntType < TYPE_MAX; cntType++)
 	{
-		LPDIRECT3DDEVICE9 pDevice;
-		pDevice = CManager::GetRenderer()->GetDevice();
+		LPCSTR strFileName;
+		switch( cntType)
+		{
+		case TYPE_000:
+			strFileName = TEXTURE_ENEMY000;
+			break;
 
-		// テクスチャの読み込み
-		D3DXCreateTextureFromFile( pDevice, TEXTURENAME, &m_pTexture);
+		case TYPE_001:
+			strFileName = TEXTURE_ENEMY001;
+			break;
+
+		case TYPE_002:
+			strFileName = TEXTURE_ENEMY002;
+			break;
+
+		case TYPE_003:
+			strFileName = TEXTURE_ENEMY003;
+			break;
+		}
+
+		if( m_pTexture[cntType] == NULL)
+		{
+			LPDIRECT3DDEVICE9 pDevice;
+			pDevice = CManager::GetRenderer()->GetDevice();
+
+			// テクスチャの読み込み
+			D3DXCreateTextureFromFile( pDevice, strFileName, &m_pTexture[cntType]);
+		}	
 	}
+
 
 	return S_OK;
 }
@@ -150,10 +175,14 @@ HRESULT CEnemy2D::Load(void)
 void CEnemy2D::Unload(void)
 {
 	//テクスチャの破棄
-	if( m_pTexture != NULL)
+	for(int cntType = 0; cntType < TYPE_MAX; cntType++)
 	{
-		m_pTexture->Release();
-		m_pTexture = NULL;
+		if( m_pTexture[cntType] != NULL)
+		{
+			m_pTexture[cntType]->Release();
+			m_pTexture[cntType] = NULL;
+		}	
 	}
+
 }
 

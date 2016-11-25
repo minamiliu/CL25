@@ -20,6 +20,7 @@
 class CRenderer;
 class CInputKeyboard;
 class CInputMouse;
+class CSound;
 
 //============================================
 //構造体定義
@@ -44,6 +45,9 @@ public:
 	static CInputKeyboard *GetInputKeyboard(void);
 	static CInputMouse *GetInputMouse(void);
 
+	//サウンド
+	static CSound *GetSound(void);
+
 private:
 	//レンダラー
 	static CRenderer *m_pRenderer;
@@ -52,6 +56,8 @@ private:
 	static CInputKeyboard *m_pInputKeyboard;
 	static CInputMouse *m_pInputMouse;
 
+	//サウンド
+	static CSound *m_pSound;
 };
 
 #endif
