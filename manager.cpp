@@ -114,7 +114,7 @@ void CManager::Uninit()
 	}
 
 	//ƒTƒEƒ“ƒh‚Ì”jŠü
-	if( m_pRenderer != NULL)
+	if( m_pSound != NULL)
 	{
 		m_pSound->Uninit();
 		delete m_pSound;
