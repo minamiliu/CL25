@@ -1,6 +1,6 @@
 //============================================
 //
-// タイトル:	 CL25課題
+// タイトル:	 未来創造展チーム204
 // プログラム名: scene2D.cpp
 // 作成者:		 HAL東京ゲーム学科　劉南宏
 // 作成日:       2016/10/19
@@ -19,25 +19,13 @@
 //============================================
 // マクロ定義
 //============================================
-
-// 頂点フォーマット( 頂点座標[2D] / 頂点カラー / テクスチャ座標 )
-#define	FVF_VERTEX_2D	(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-
 #define NUM_VERTEX (4)
 #define NUM_POLYGON (2)
-
-#define TEXTURENAME "data/TEXTURE/XXX.png"
 
 //=============================================================================
 // 構造体定義
 //=============================================================================
-typedef struct
-{
-	D3DXVECTOR3 pos;	// 頂点座標
-	float rhw;			// 座標変換用係数(1.0fで固定)
-	D3DCOLOR col;		// 頂点カラー
-	D3DXVECTOR2 tex;	// テクスチャ座標
-} VERTEX_2D;
+
 
 //=============================================================================
 //コンストラクタ
@@ -124,6 +112,9 @@ HRESULT CScene2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	return S_OK;
 }
 
+//=============================================================================
+// ポリゴンの初期化処理
+//=============================================================================
 HRESULT CScene2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 {
 	Init(pos, size);
@@ -144,8 +135,6 @@ HRESULT CScene2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 
 	return S_OK;
 }
-
-
 
 
 //=============================================================================
@@ -279,9 +268,9 @@ void CScene2D::BindTexture( LPDIRECT3DTEXTURE9 pTexture)
 }
 
 //=============================================================================
-//
+//アニメのパターンを変える
 //=============================================================================
-void CScene2D::ChangeTextureAnime(int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide)
+void CScene2D::ChangeTextureAnime( int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide)
 {
 	//頂点バッファの中身を埋める
 	VERTEX_2D *pVtx;
@@ -308,9 +297,29 @@ void CScene2D::ChangeTextureAnime(int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVEC
 }
 
 //=============================================================================
-//
+//ポリゴンのサイズを取得
 //=============================================================================
 D3DXVECTOR3 CScene2D::GetSize(void)
 {
 	return m_size;
+}
+
+//=============================================================================
+//色を変更
+//=============================================================================
+void CScene2D::SetColor(const D3DXCOLOR &col)
+{
+	// 頂点情報を設定
+	VERTEX_2D *pVtx;
+
+	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
+
+	//color
+	pVtx[0].col = col;
+	pVtx[1].col = col;
+	pVtx[2].col = col;
+	pVtx[3].col = col;
+
+	m_pVtxBuff->Unlock();
 }

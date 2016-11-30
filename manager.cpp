@@ -18,6 +18,7 @@
 #include "player2D.h"
 #include "enemy2D.h"
 #include "sound.h"
+#include "number.h"
 
 //============================================
 // マクロ定義
@@ -31,7 +32,7 @@ CRenderer *CManager::m_pRenderer = NULL;
 CInputKeyboard *CManager::m_pInputKeyboard = NULL;
 CInputMouse *CManager::m_pInputMouse = NULL;
 CSound *CManager::m_pSound = NULL;
-
+CNumber *CManager::m_pScore = NULL;
 //============================================
 //コンストラクタ
 //============================================
@@ -74,7 +75,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 
 	//敵
 	CEnemy2D::Load();
-	for(int cntEnemy = 0; cntEnemy < 5; cntEnemy++)
+	for(int cntEnemy = 0; cntEnemy < 10; cntEnemy++)
 	{
 		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_000);
 		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 200.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_001);
@@ -84,6 +85,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 
 	//背景
 	CScene2D::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG);
+
+	//スコア
+	m_pScore = CNumber::Create( D3DXVECTOR3(SCREEN_WIDTH/2, 35.0f, 0.0f), D3DXVECTOR3( 300.0f, 50.0f, 0.0f), 6, D3DXCOLOR( 0.5, 0.5f, 1.0f, 1.0f));
 	
 
 	return S_OK;
@@ -184,4 +188,12 @@ CInputMouse *CManager::GetInputMouse(void)
 CSound *CManager::GetSound(void)
 {
 	return m_pSound;
+}
+
+//=============================================================================
+//
+//=============================================================================
+CNumber *CManager::GetScore(void)
+{
+	return m_pScore;
 }

@@ -55,11 +55,12 @@ CEnemy2D::~CEnemy2D()
 // ポリゴンの初期化処理
 //=============================================================================
 
-HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
+HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 {
 	CScene2D::Init(pos, size);
 	SetObjType( CScene::OBJTYPE_ENEMY);
 
+	m_type = type;
 	m_move = D3DXVECTOR3( 5.0f, 0.0f, 0.0f);
 
 
@@ -92,14 +93,15 @@ void CEnemy2D::Update(void)
 	pos.y += sinf(m_fCntAngle) * 1.0f;
 	m_fCntAngle += 0.1f;
 	m_fCntAngle = ( m_fCntAngle >= D3DX_PI * 2) ? 0.0f : m_fCntAngle; 
-	
+
 	//壁に跳ね返す
-	if(pos.x < size.x/2 || pos.x > SCREEN_WIDTH - size.x/2)
+	if( pos.x < size.x/2 || pos.x > SCREEN_WIDTH - size.x/2)
 	{
-		m_move.x *= -1;
+		m_move *= -1;
 	}
-	
+
 	pos += m_move;
+
 
 	//弾の移動更新
 	CScene2D::SetPosition(pos);
@@ -120,7 +122,7 @@ CEnemy2D *CEnemy2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 {
 	CEnemy2D *pBullet2D;
 	pBullet2D = new CEnemy2D;
-	pBullet2D->Init(pos, size);
+	pBullet2D->Init(pos, size, type);
 
 	//テクスチャの割り当て
 	pBullet2D->BindTexture(m_pTexture[type]);
@@ -184,5 +186,13 @@ void CEnemy2D::Unload(void)
 		}	
 	}
 
+}
+
+//=============================================================================
+//
+//=============================================================================
+CEnemy2D::TYPE CEnemy2D::GetType(void)
+{
+	return m_type;
 }
 

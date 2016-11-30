@@ -59,10 +59,11 @@ CExplosion2D::~CExplosion2D()
 // ポリゴンの初期化処理
 //=============================================================================
 
-HRESULT CExplosion2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
+HRESULT CExplosion2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, const D3DXCOLOR &col)
 {
 	CScene2D::Init(pos, size, D3DXVECTOR2(TEX_PATTERN_SIZE_X, TEX_PATTERN_SIZE_Y));
 	SetObjType( CScene::OBJTYPE_EXPLOSION);
+	SetColor( col);
 
 	//アニメーション
 	m_nCounterAnim = 0;
@@ -125,11 +126,11 @@ void CExplosion2D::Draw(void)
 //=============================================================================
 // ポリゴンの生成処理
 //=============================================================================
-CExplosion2D *CExplosion2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
+CExplosion2D *CExplosion2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, const D3DXCOLOR &col)
 {
 	CExplosion2D *pExplosion;
 	pExplosion = new CExplosion2D;
-	pExplosion->Init(pos, size);
+	pExplosion->Init(pos, size, col);
 
 	//テクスチャの読み込み
 	pExplosion->Load();

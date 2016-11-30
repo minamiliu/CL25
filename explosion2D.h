@@ -30,12 +30,12 @@ public:
 	CExplosion2D();
 	virtual ~CExplosion2D();
 
-	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, const D3DXCOLOR &col);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 
-	static CExplosion2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	static CExplosion2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, const D3DXCOLOR &col);
 	static HRESULT Load(void);
 	static void Unload(void);
 

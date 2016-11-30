@@ -16,6 +16,8 @@
 #include "input.h"
 #include "bullet2D.h"
 #include "explosion2D.h"
+#include "number.h"
+#include "enemy2D.h"
 
 //============================================
 // ƒ}ƒNƒ’è‹`
@@ -80,7 +82,6 @@ void CBullet2D::Uninit(void)
 //=============================================================================
 void CBullet2D::Update(void)
 {
-	CScene2D::Update();
 
 	//’e‚ÌˆÚ“®XV
 	D3DXVECTOR3 pos = CScene2D::GetPosition();
@@ -91,11 +92,12 @@ void CBullet2D::Update(void)
 	m_nCntFrame++;
 	if( m_nCntFrame > 120)
 	{
-		CExplosion2D::Create(pos, D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+		CExplosion2D::Create(pos, D3DXVECTOR3(50.0f, 50.0f, 0.0f), WHITE(1.0f));
 		this->Uninit();
 		return;
 	}
 
+	//“–‚½‚è”»’è
 	for( int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
 	{
 		CScene *pScene;
@@ -114,13 +116,34 @@ void CBullet2D::Update(void)
 
 				if( sqrt( (posEnemy.x - posBullet.x)*(posEnemy.x - posBullet.x) + (posEnemy.y - posBullet.y)*(posEnemy.y - posBullet.y)  ) < 50.0f)
 				{
-					CExplosion2D::Create(pos, D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+					//”š•—‚ÌF•t‚¯
+					switch( ((CEnemy2D*)pScene)->GetType())
+					{
+					case CEnemy2D::TYPE_000:
+						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), RED(1.0f));
+						break;
+
+					case CEnemy2D::TYPE_001:
+						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), WHITE(1.0f));
+						break;
+
+					case CEnemy2D::TYPE_002:
+						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), YELLOW(1.0f));
+						break;
+
+					case CEnemy2D::TYPE_003:
+						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), BLUE(1.0f));
+						break;
+					}
 
 					//“G‚Ì”jŠü
  					pScene->Uninit();
 
 					//’e(Ž©•ª)‚Ì”jŠü
 					this->Uninit();
+
+					//ƒXƒRƒA
+					CManager::GetScore()->AddNumber( 100);
 
 					return;
 				}
