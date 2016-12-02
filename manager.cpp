@@ -18,7 +18,7 @@
 #include "player2D.h"
 #include "enemy2D.h"
 #include "sound.h"
-#include "number.h"
+#include "score.h"
 
 //============================================
 // マクロ定義
@@ -32,7 +32,7 @@ CRenderer *CManager::m_pRenderer = NULL;
 CInputKeyboard *CManager::m_pInputKeyboard = NULL;
 CInputMouse *CManager::m_pInputMouse = NULL;
 CSound *CManager::m_pSound = NULL;
-CNumber *CManager::m_pScore = NULL;
+CScore *CManager::m_pScore = NULL;
 //============================================
 //コンストラクタ
 //============================================
@@ -87,7 +87,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	CScene2D::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG);
 
 	//スコア
-	m_pScore = CNumber::Create( D3DXVECTOR3(SCREEN_WIDTH/2, 35.0f, 0.0f), D3DXVECTOR3( 300.0f, 50.0f, 0.0f), 6, D3DXCOLOR( 0.5, 0.5f, 1.0f, 1.0f));
+	m_pScore = CScore::Create( D3DXVECTOR3(SCREEN_WIDTH/2, 35.0f, 0.0f), D3DXVECTOR3( 300.0f, 50.0f, 0.0f), 6, D3DXCOLOR( 0.5, 0.5f, 1.0f, 1.0f));
 	
 
 	return S_OK;
@@ -193,7 +193,7 @@ CSound *CManager::GetSound(void)
 //=============================================================================
 //
 //=============================================================================
-CNumber *CManager::GetScore(void)
+CScore *CManager::GetScore(void)
 {
 	return m_pScore;
 }

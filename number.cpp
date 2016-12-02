@@ -1,9 +1,9 @@
 //============================================
 //
 // タイトル:	 未来創造展チーム204
-// プログラム名: bullet2D.cpp
+// プログラム名: number.cpp
 // 作成者:		 HAL東京ゲーム学科　劉南宏
-// 作成日:       2016/11/11
+// 作成日:       2016/10/19
 //
 //============================================
 
@@ -11,38 +11,29 @@
 //インクルードファイル
 //============================================
 #include "main.h"
-#include "manager.h"
-#include "renderer.h"
 #include "number.h"
-
+#include "renderer.h"
+#include "manager.h"
+#include "input.h"
 
 //============================================
 // マクロ定義
 //============================================
-#define TEXTURENAME "data/TEXTURE/number000.png"
-
-#define	TEX_PATTERN_DIVIDE_X		(10)								// アニメーションパターンのテクスチャ内での分割数(Ｘ方向)
-#define	TEX_PATTERN_DIVIDE_Y		(1)								// アニメーションパターンのテクスチャ内での分割数(Ｙ方向)
-#define	TEX_PATTERN_SIZE_X			(1.0f/TEX_PATTERN_DIVIDE_X)		// １パターンのテクスチャサイズ(Ｘ方向)(1.0f/X方向分割数)
-#define	TEX_PATTERN_SIZE_Y			(1.0f/TEX_PATTERN_DIVIDE_Y)		// １パターンのテクスチャサイズ(Ｙ方向)(1.0f/Y方向分割数)
-
-#define	NUM_ANIM_PATTERN			(TEX_PATTERN_DIVIDE_X*TEX_PATTERN_DIVIDE_Y)	// アニメーションのパターン数(X方向分割数×Y方向分割数)
-//#define	TIME_CHANGE_PATTERN			(5)								// アニメーションの切り替わるタイミング(フレーム数)
-
-//============================================
-// 静的メンバー変数の初期化
-//============================================
-LPDIRECT3DTEXTURE9 CNumber::m_pTexture = NULL;
 
 //=============================================================================
 // 構造体定義
 //=============================================================================
+
 
 //=============================================================================
 //コンストラクタ
 //=============================================================================
 CNumber::CNumber()
 {
+	m_pTexture = NULL;		// テクスチャへのポインタ
+	m_pVtxBuff = NULL;		// 頂点バッファへのポインタ
+	m_pos = D3DXVECTOR3( 0.0f, 0.0f, 0.0f);			// ポリゴンの位置
+	m_bLoadTexture = false;
 }
 
 //=============================================================================
@@ -53,41 +44,65 @@ CNumber::~CNumber()
 	
 }
 
-
 //=============================================================================
 // ポリゴンの初期化処理
 //=============================================================================
-
-HRESULT CNumber::Init(D3DXVECTOR3 numberPos, D3DXVECTOR3 numberSize, int maxKeta, const D3DXCOLOR &col)
+HRESULT CNumber::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 {
-	m_nMaxKeta = maxKeta;
-	D3DXVECTOR3 rightPos = numberPos;
-	D3DXVECTOR3 ketaSize = numberSize;
+	LPDIRECT3DDEVICE9 pDevice;
+	pDevice = CManager::GetRenderer()->GetDevice();
 
-	m_ppPolygon = new CScene2D*[maxKeta];
+	// ポリゴンの情報を設置
+	m_pos = pos;
+	m_size = size;
+	m_bLoadTexture = false;
 
-	//初期化
-	ketaSize.x /= maxKeta;
-	rightPos.x = numberPos.x + ketaSize.x * (maxKeta - 1) / 2.0f;
-	
-	D3DXVECTOR3 tmpPos = rightPos;
-	for(int cntKeta = 0; cntKeta < m_nMaxKeta; cntKeta++)
+	// 頂点バッファの生成
+	if(FAILED(pDevice->CreateVertexBuffer(
+		sizeof(VERTEX_2D)*NUM_VERTEX,	//頂点データのバッファサイズ 
+		D3DUSAGE_WRITEONLY, 
+		FVF_VERTEX_2D,			//頂点フォーマット
+		D3DPOOL_MANAGED, 
+		&m_pVtxBuff,		//頂点バッファインターフェースのポインタ
+		NULL)))
 	{
-		m_ppPolygon[cntKeta] = new CScene2D;
-		m_ppPolygon[cntKeta]->Init( tmpPos , ketaSize, D3DXVECTOR2( TEX_PATTERN_SIZE_X, TEX_PATTERN_SIZE_Y));
-		tmpPos.x -= ketaSize.x;
+		return E_FAIL;
 	}
 
-	//点数の初期化
-	m_nValue = 0;
+	// 頂点情報を設定
+	VERTEX_2D *pVtx;
 
-	//色を設定
-	SetColor( col);
+	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
+
+	// ポリゴンの位置を設定
+	pVtx[0].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(m_pos.x + (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y + (m_size.y/2), 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(m_pos.x + (m_size.x/2), m_pos.y + (m_size.y/2), 0.0f);
+
+	//rhw
+	pVtx[0].rhw = 1.0f;
+	pVtx[1].rhw = 1.0f;
+	pVtx[2].rhw = 1.0f;
+	pVtx[3].rhw = 1.0f;
+
+	//color
+	pVtx[0].col = D3DCOLOR_RGBA(255,255,255,255);
+	pVtx[1].col = D3DCOLOR_RGBA(255,255,255,255);
+	pVtx[2].col = D3DCOLOR_RGBA(255,255,255,255);
+	pVtx[3].col = D3DCOLOR_RGBA(255,255,255,255);
+
+	//テクスチャ座標指定
+	pVtx[0].tex = D3DXVECTOR2( ptnSize.x * 0.0f, ptnSize.y * 0.0f);
+	pVtx[1].tex = D3DXVECTOR2( ptnSize.x * 1.0f, ptnSize.y * 0.0f);
+	pVtx[2].tex = D3DXVECTOR2( ptnSize.x * 0.0f, ptnSize.y * 1.0f);
+	pVtx[3].tex = D3DXVECTOR2( ptnSize.x * 1.0f, ptnSize.y * 1.0f);
+
+	m_pVtxBuff->Unlock();
 
 	return S_OK;
 }
-
-
 
 
 //=============================================================================
@@ -95,17 +110,19 @@ HRESULT CNumber::Init(D3DXVECTOR3 numberPos, D3DXVECTOR3 numberSize, int maxKeta
 //=============================================================================
 void CNumber::Uninit(void)
 {
-	for(int cntKeta = 0; cntKeta < m_nMaxKeta; cntKeta++)
+	// 頂点バッファの破棄
+	if(m_pVtxBuff != NULL)
 	{
-		//数字桁の破棄
-		m_ppPolygon[cntKeta]->Uninit();
+		m_pVtxBuff->Release();
+		m_pVtxBuff = NULL;
 	}
 
-	delete[] m_ppPolygon;
-	m_ppPolygon = NULL;
-	
-	//number本体の破棄
-	CScene2D::Uninit();
+	// テクスチャの破棄
+	if(m_pTexture != NULL && m_bLoadTexture == true)
+	{
+		m_pTexture->Release();
+		m_pTexture = NULL;
+	}
 }
 
 
@@ -114,7 +131,7 @@ void CNumber::Uninit(void)
 //=============================================================================
 void CNumber::Update(void)
 {
-	
+
 }
 
 //=============================================================================
@@ -122,113 +139,132 @@ void CNumber::Update(void)
 //=============================================================================
 void CNumber::Draw(void)
 {
-	for(int nKeta = 0; nKeta < m_nMaxKeta; nKeta++)
-	{
-		m_ppPolygon[nKeta]->Draw();
-	}
+	LPDIRECT3DDEVICE9 pDevice;
+	pDevice = CManager::GetRenderer()->GetDevice();
+
+	// 頂点バッファをデータストリームに設定
+	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_2D));
+
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_2D);
+
+	// テクスチャの設定
+	pDevice->SetTexture(0, m_pTexture);
+
+	// ポリゴンの描画
+	pDevice->DrawPrimitive(
+		D3DPT_TRIANGLESTRIP,	//プリミティブの種類
+		0,						//ロードする最初の頂点インデックス
+		NUM_POLYGON				//ポリゴンの数
+	);
 }
 
 //=============================================================================
 // ポリゴンの生成処理
 //=============================================================================
-CNumber *CNumber::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, int maxKeta, const D3DXCOLOR &col)
+CNumber *CNumber::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 {
 	CNumber *pNumber;
 	pNumber = new CNumber;
-	pNumber->Init(pos, size, maxKeta, col);
+	pNumber->Init(pos, size, ptnSize);
 
-	//テクスチャの読み込み
-	pNumber->Load();
+	//テクスチャの割り当て
 
-	//桁分のテクスチャの割り当て
-	pNumber->BindAllTexture();
-	
+
 	return pNumber;
 }
 
 //=============================================================================
-//
+// ポリゴンの座標設置
 //=============================================================================
-HRESULT CNumber::Load(void)
+void CNumber::SetPosition(D3DXVECTOR3 pos)
 {
-	if( m_pTexture == NULL)
-	{
-		LPDIRECT3DDEVICE9 pDevice;
-		pDevice = CManager::GetRenderer()->GetDevice();
+	m_pos = pos;
 
-		// テクスチャの読み込み
-		D3DXCreateTextureFromFile( pDevice, TEXTURENAME, &m_pTexture);
-	}
+	// 頂点情報を設定
+	VERTEX_2D *pVtx;
 
-	return S_OK;
+	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
+
+	// ポリゴンの位置を設定
+	pVtx[0].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(m_pos.x + (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y + (m_size.y/2), 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(m_pos.x + (m_size.x/2), m_pos.y + (m_size.y/2), 0.0f);
+
+	m_pVtxBuff->Unlock();
 }
 
 //=============================================================================
-//
+// ポリゴンの座標取得
 //=============================================================================
-void CNumber::Unload(void)
+D3DXVECTOR3 CNumber::GetPosition(void)
 {
-	//テクスチャの破棄
-	if( m_pTexture != NULL)
-	{
-		m_pTexture->Release();
-		m_pTexture = NULL;
-	}
+	return m_pos;
 }
 
 //=============================================================================
-//数字をそのまま表示する
+// ポリゴンのテクスチャを割り当てる
 //=============================================================================
-void CNumber::SetNumber(int score)
+void CNumber::BindTexture( LPDIRECT3DTEXTURE9 pTexture)
 {
-	int number;
-
-	//範囲チェック
-	int maxScore = int(powf( 10.0f, m_nMaxKeta) -1);
-	if(score >  maxScore) score = maxScore;
-	else if(score < 0) score = 0;
-
-	//点数更新
-	m_nValue = score;
-
-	for(int nKeta = 0; nKeta < m_nMaxKeta; nKeta++)
-	{
-		//一番右の数字を取る
-		number = int(score % (int)powf( 10.0f, float(nKeta+1)) / powf( 10.0f, float(nKeta)));
-
-		//テクスチャをずらす
-		m_ppPolygon[nKeta]->ChangeTextureAnime( number, D3DXVECTOR2( TEX_PATTERN_SIZE_X, TEX_PATTERN_SIZE_Y), D3DXVECTOR2( TEX_PATTERN_DIVIDE_X, TEX_PATTERN_DIVIDE_Y));
-	}
+	m_pTexture = pTexture;
 }
 
 //=============================================================================
-//桁分のテクスチャの割り当て
+//アニメのパターンを変える
 //=============================================================================
-void CNumber::BindAllTexture(void)
+void CNumber::ChangeTextureAnime( int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide)
 {
-	for(int cntKeta = 0; cntKeta < m_nMaxKeta; cntKeta++)
-	{
-		//テクスチャの割り当て
-		m_ppPolygon[cntKeta]->BindTexture( m_pTexture);
-	}
+	//頂点バッファの中身を埋める
+	VERTEX_2D *pVtx;
+	float fPosXLeft, fPosXRight;
+	float fPosYUp, fPosYDown;
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// テクスチャ座標の設定
+	fPosXLeft	= ptnSize.x * (nPatternAnim % (int)ptnDivide.x);
+	fPosXRight	= ptnSize.x * (nPatternAnim % (int)ptnDivide.x + 1);
+	fPosYUp		= ptnSize.y * (nPatternAnim / (int)ptnDivide.x);
+	fPosYDown	= ptnSize.y * (nPatternAnim / (int)ptnDivide.x + 1);
+
+
+	pVtx[0].tex = D3DXVECTOR2( fPosXLeft, fPosYUp );
+	pVtx[1].tex = D3DXVECTOR2( fPosXRight, fPosYUp );
+	pVtx[2].tex = D3DXVECTOR2( fPosXLeft, fPosYDown );
+	pVtx[3].tex = D3DXVECTOR2( fPosXRight, fPosYDown );
+
+	// 頂点データをアンロックする
+	m_pVtxBuff->Unlock();
 }
 
 //=============================================================================
-//全桁の色を一気に変更
+//ポリゴンのサイズを取得
+//=============================================================================
+D3DXVECTOR3 CNumber::GetSize(void)
+{
+	return m_size;
+}
+
+//=============================================================================
+//色を変更
 //=============================================================================
 void CNumber::SetColor(const D3DXCOLOR &col)
 {
-	for(int cntKeta = 0; cntKeta < m_nMaxKeta; cntKeta++)
-	{
-		m_ppPolygon[cntKeta]->SetColor( col);
-	}
-}
+	// 頂点情報を設定
+	VERTEX_2D *pVtx;
 
-//=============================================================================
+	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
 
-//=============================================================================
-void CNumber::AddNumber(int score)
-{
-	m_nValue += score;
-	SetNumber( m_nValue);
+	//color
+	pVtx[0].col = col;
+	pVtx[1].col = col;
+	pVtx[2].col = col;
+	pVtx[3].col = col;
+
+	m_pVtxBuff->Unlock();
 }

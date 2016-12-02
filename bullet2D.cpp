@@ -16,7 +16,7 @@
 #include "input.h"
 #include "bullet2D.h"
 #include "explosion2D.h"
-#include "number.h"
+#include "score.h"
 #include "enemy2D.h"
 
 //============================================
@@ -143,8 +143,8 @@ void CBullet2D::Update(void)
 					this->Uninit();
 
 					//ƒXƒRƒA
-					CManager::GetScore()->AddNumber( 100);
-
+					CManager::GetScore()->AddScore( 100);
+					
 					return;
 				}
 			}

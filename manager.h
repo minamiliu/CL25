@@ -21,7 +21,7 @@ class CRenderer;
 class CInputKeyboard;
 class CInputMouse;
 class CSound;
-class CNumber;
+class CScore;
 
 //============================================
 //構造体定義
@@ -50,7 +50,7 @@ public:
 	static CSound *GetSound(void);
 
 	//スコア
-	static CNumber *GetScore(void);
+	static CScore *GetScore(void);
 
 private:
 	//レンダラー
@@ -64,7 +64,7 @@ private:
 	static CSound *m_pSound;
 
 	//スコア
-	static CNumber *m_pScore;
+	static CScore *m_pScore;
 };
 
 #endif
