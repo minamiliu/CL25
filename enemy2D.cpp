@@ -24,6 +24,14 @@
 #define TEXTURE_ENEMY002 "data/TEXTURE/enemy002.png"
 #define TEXTURE_ENEMY003 "data/TEXTURE/enemy003.png"
 
+#define	TEX_PATTERN_DIVIDE_X		(2)								// アニメーションパターンのテクスチャ内での分割数(Ｘ方向)
+#define	TEX_PATTERN_DIVIDE_Y		(1)								// アニメーションパターンのテクスチャ内での分割数(Ｙ方向)
+#define	TEX_PATTERN_SIZE_X			(1.0f/TEX_PATTERN_DIVIDE_X)		// １パターンのテクスチャサイズ(Ｘ方向)(1.0f/X方向分割数)
+#define	TEX_PATTERN_SIZE_Y			(1.0f/TEX_PATTERN_DIVIDE_Y)		// １パターンのテクスチャサイズ(Ｙ方向)(1.0f/Y方向分割数)
+
+#define	NUM_ANIM_PATTERN			(TEX_PATTERN_DIVIDE_X*TEX_PATTERN_DIVIDE_Y)	// アニメーションのパターン数(X方向分割数×Y方向分割数)
+#define	TIME_CHANGE_PATTERN			(30)								// アニメーションの切り替わるタイミング(フレーム数)
+
 //============================================
 // 静的メンバー変数の初期化
 //============================================
@@ -57,12 +65,13 @@ CEnemy2D::~CEnemy2D()
 
 HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 {
-	CScene2D::Init(pos, size);
+	CScene2D::Init(pos, size, D3DXVECTOR2(TEX_PATTERN_SIZE_X, TEX_PATTERN_SIZE_Y));
 	SetObjType( CScene::OBJTYPE_ENEMY);
 
 	m_type = type;
 	m_move = D3DXVECTOR3( 5.0f, 0.0f, 0.0f);
-
+	m_nCounterAnim = 0;	// ポリゴンのアニメーションカウンター
+	m_nPatternAnim = 0;	// ポリゴンのアニメーションパターンNo.
 
 	return S_OK;
 }
@@ -95,13 +104,34 @@ void CEnemy2D::Update(void)
 	m_fCntAngle = ( m_fCntAngle >= D3DX_PI * 2) ? 0.0f : m_fCntAngle; 
 
 	//壁に跳ね返す
-	if( pos.x < size.x/2 || pos.x > SCREEN_WIDTH - size.x/2)
+	//if( pos.x < size.x/2 || pos.x > SCREEN_WIDTH - size.x/2)
+	//{
+	//	m_move *= -1;
+	//}
+
+	//pos += m_move;
+
+	m_nCounterAnim++;
+	if( m_nCounterAnim >= TIME_CHANGE_PATTERN )
 	{
-		m_move *= -1;
+
+		// パターンの切り替え
+		m_nPatternAnim++;
+		if( m_nPatternAnim >= NUM_ANIM_PATTERN){
+
+			m_nPatternAnim = 0;
+		}
+		
+		{// テクスチャ座標を設定
+			ChangeTextureAnime( 
+				m_nPatternAnim, 
+				D3DXVECTOR2(TEX_PATTERN_SIZE_X, TEX_PATTERN_SIZE_Y), 
+				D3DXVECTOR2(TEX_PATTERN_DIVIDE_X, TEX_PATTERN_DIVIDE_Y));
+
+			//m_nCounterAnimのリセット
+			m_nCounterAnim = 0;
+		}
 	}
-
-	pos += m_move;
-
 
 	//弾の移動更新
 	CScene2D::SetPosition(pos);

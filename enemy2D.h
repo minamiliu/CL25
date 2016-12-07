@@ -56,6 +56,10 @@ private:
 	D3DXVECTOR3 m_move;
 	float m_fCntAngle;
 	TYPE m_type;
+
+	//アニメーション
+	int m_nCounterAnim;	// ポリゴンのアニメーションカウンター
+	int	m_nPatternAnim;	// ポリゴンのアニメーションパターンNo.
 };
 
 #endif
