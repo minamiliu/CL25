@@ -53,7 +53,6 @@ public:
 	//テクスチャ関連
 	HRESULT Load(LPCSTR strFileName);
 	void BindTexture( LPDIRECT3DTEXTURE9 pTexture);
-	void ChangeTextureAnime( int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide); //アニメーション
 
 	//頂点データ関連
 	void SetPosition(D3DXVECTOR3 pos);
@@ -63,6 +62,9 @@ public:
 
 	static CScene2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, LPCSTR strFileName);
 
+protected:
+	void ChangeTextureAnime( int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide); //アニメーション
+	void SetTexture( D3DXVECTOR2 speed);
 
 private:
 

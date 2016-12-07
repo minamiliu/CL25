@@ -13,7 +13,7 @@
 #include "main.h"
 #include "manager.h"
 #include "renderer.h"
-#include "scene2D.h"
+#include "bg.h"
 #include "input.h"
 #include "player2D.h"
 #include "enemy2D.h"
@@ -23,7 +23,9 @@
 //============================================
 // マクロ定義
 //============================================
-#define TEXTURE_BG "data/TEXTURE/bg100.png"
+#define TEXTURE_BG00 "data/TEXTURE/bg100.png"
+#define TEXTURE_BG01 "data/TEXTURE/bg101.png"
+#define TEXTURE_BG02 "data/TEXTURE/bg102.png"
 
 //============================================
 // 静的メンバー変数の初期化
@@ -84,7 +86,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	}
 
 	//背景
-	CScene2D::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG);
+	CBg::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG00, 0.005);
+	CBg::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG01, 0.003);
+	CBg::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG02, 0.001);
 
 	//スコア
 	m_pScore = CScore::Create( D3DXVECTOR3(SCREEN_WIDTH/2, 35.0f, 0.0f), D3DXVECTOR3( 300.0f, 50.0f, 0.0f), 6, D3DXCOLOR( 0.5, 0.5f, 1.0f, 1.0f));

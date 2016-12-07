@@ -323,3 +323,24 @@ void CScene2D::SetColor(const D3DXCOLOR &col)
 
 	m_pVtxBuff->Unlock();
 }
+
+//=============================================================================
+//テクスチャをスクロールをする
+//=============================================================================
+void CScene2D::SetTexture( D3DXVECTOR2 speed)
+{
+	//頂点バッファの中身を埋める
+	VERTEX_2D *pVtx;
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	//テクスチャ座標指定
+	pVtx[0].tex = D3DXVECTOR2(speed.x, speed.y);
+	pVtx[1].tex = D3DXVECTOR2(speed.x + 1.0F, speed.y + 0.0F);
+	pVtx[2].tex = D3DXVECTOR2(speed.x + 0.0F, speed.y + 1.0F);
+	pVtx[3].tex = D3DXVECTOR2(speed.x + 1.0F, speed.y + 1.0F);
+
+	// 頂点データをアンロックする
+	m_pVtxBuff->Unlock();
+}
