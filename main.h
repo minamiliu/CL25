@@ -50,6 +50,7 @@
 #define SKY(alpha)								D3DCOLOR_COLORVALUE(0.0f,0.5f,1.0f,(alpha))
 #define BIAGE(alpha)							D3DCOLOR_COLORVALUE(1.0f,0.75f,0.5f,(alpha))
 #define BLACK(alpha)							D3DCOLOR_COLORVALUE(0.0f,0.0f,0.0f,(alpha))
+#define GRAY(alpha)								D3DCOLOR_COLORVALUE(0.5f,0.5f,0.5f,(alpha))
 
 //*****************************************************************************
 // プロトタイプ宣言

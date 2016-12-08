@@ -52,7 +52,6 @@ public:
 	static void Unload(void);
 	static void CreateAllEnemy(void);
 	static void UpdateRefPos(void);
-	static void InitLeftRight(void);
 
 private:
 

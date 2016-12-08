@@ -22,7 +22,7 @@ class CInputKeyboard;
 class CInputMouse;
 class CSound;
 class CScore;
-
+class CLife;
 //============================================
 //構造体定義
 //============================================
@@ -52,6 +52,9 @@ public:
 	//スコア
 	static CScore *GetScore(void);
 
+	//ライフ
+	static CLife *GetLife(void);
+
 private:
 	//レンダラー
 	static CRenderer *m_pRenderer;
@@ -65,6 +68,9 @@ private:
 
 	//スコア
 	static CScore *m_pScore;
+
+	//ライフ
+	static CLife *m_pLife;
 };
 
 #endif

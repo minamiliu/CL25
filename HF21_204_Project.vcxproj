@@ -83,6 +83,8 @@
     <ClCompile Include="enemy2D.cpp" />
     <ClCompile Include="explosion2D.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="heart.cpp" />
+    <ClCompile Include="life.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="number.cpp" />
@@ -99,6 +101,8 @@
     <ClInclude Include="enemy2D.h" />
     <ClInclude Include="explosion2D.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="heart.h" />
+    <ClInclude Include="life.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
     <ClInclude Include="number.h" />

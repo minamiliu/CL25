@@ -54,14 +54,15 @@ CBullet2D::~CBullet2D()
 // É|ÉäÉSÉìÇÃèâä˙âªèàóù
 //=============================================================================
 
-HRESULT CBullet2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
+HRESULT CBullet2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 move, const D3DXCOLOR &col, CScene::OBJTYPE obj)
 {
 	CScene2D::Init(pos, size);
-	SetObjType( CScene::OBJTYPE_BULLET);
+	SetObjType( obj);
+	SetColor(col);
 
-	m_move = D3DXVECTOR3( 0.0f, -5.0f, 0.0f);
+	m_move = move;
 	m_nCntFrame = 0;
-
+	
 	return S_OK;
 }
 
@@ -97,63 +98,67 @@ void CBullet2D::Update(void)
 		return;
 	}
 
-	//ìñÇΩÇËîªíË
-	for( int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
+	//ìGÇ∆ÇÃìñÇΩÇËîªíË
+	if(this->GetObjType() == CScene::OBJTYPE_BULLET_P)
 	{
-		CScene *pScene;
-		pScene = CScene::GetScene( nCntScene);
-		
-		if( pScene != NULL)
+		for( int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
 		{
-			CScene::OBJTYPE type;
-			type = pScene->GetObjType();
-
-			if( type == CScene::OBJTYPE_ENEMY)
+			CScene *pScene;
+			pScene = CScene::GetScene( nCntScene);
+		
+			if( pScene != NULL)
 			{
-				D3DXVECTOR3 posEnemy, posBullet;
-				posEnemy = pScene->GetPosition();
-				posBullet = this->GetPosition();
+				CScene::OBJTYPE type;
+				type = pScene->GetObjType();
 
-				if( sqrt( (posEnemy.x - posBullet.x)*(posEnemy.x - posBullet.x) + (posEnemy.y - posBullet.y)*(posEnemy.y - posBullet.y)  ) < 50.0f)
+				if( type == CScene::OBJTYPE_ENEMY)
 				{
-					//îöïóÇÃêFïtÇØ
-					switch( ((CEnemy2D*)pScene)->GetType())
+					D3DXVECTOR3 posEnemy, posBullet;
+					posEnemy = pScene->GetPosition();
+					posBullet = this->GetPosition();
+
+					if( sqrt( (posEnemy.x - posBullet.x)*(posEnemy.x - posBullet.x) + (posEnemy.y - posBullet.y)*(posEnemy.y - posBullet.y)  ) < 50.0f)
 					{
-					case CEnemy2D::TYPE_000:
-						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), RED(1.0f));
-						break;
+						//îöïóÇÃêFïtÇØ
+						switch( ((CEnemy2D*)pScene)->GetType())
+						{
+						case CEnemy2D::TYPE_000:
+							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), RED(1.0f));
+							break;
 
-					case CEnemy2D::TYPE_001:
-						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), WHITE(1.0f));
-						break;
+						case CEnemy2D::TYPE_001:
+							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), WHITE(1.0f));
+							break;
 
-					case CEnemy2D::TYPE_002:
-						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), YELLOW(1.0f));
-						break;
+						case CEnemy2D::TYPE_002:
+							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), GRAY(1.0f));
+							break;
 
-					case CEnemy2D::TYPE_003:
-						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), BLUE(1.0f));
-						break;
+						case CEnemy2D::TYPE_003:
+							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), BLUE(1.0f));
+							break;
 
-					case CEnemy2D::TYPE_004:
-						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), GREEN(1.0f));
-						break;
-					}
+						case CEnemy2D::TYPE_004:
+							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), GREEN(1.0f));
+							break;
+						}
 
-					//ìGÇÃîjä¸
- 					pScene->Uninit();
+						//ìGÇÃîjä¸
+ 						pScene->Uninit();
 
-					//íe(é©ï™)ÇÃîjä¸
-					this->Uninit();
+						//íe(é©ï™)ÇÃîjä¸
+						this->Uninit();
 
-					//ÉXÉRÉA
-					CManager::GetScore()->AddScore( 100);
+						//ÉXÉRÉA
+						CManager::GetScore()->AddScore( 100);
 					
-					return;
+						return;
+					}
 				}
 			}
-		}
+		}	
 	}
+
 }
 
 //=============================================================================
@@ -167,11 +172,11 @@ void CBullet2D::Draw(void)
 //=============================================================================
 // É|ÉäÉSÉìÇÃê∂ê¨èàóù
 //=============================================================================
-CBullet2D *CBullet2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
+CBullet2D *CBullet2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 move, const D3DXCOLOR &col, CScene::OBJTYPE obj)
 {
 	CBullet2D *pBullet2D;
 	pBullet2D = new CBullet2D;
-	pBullet2D->Init(pos, size);
+	pBullet2D->Init(pos, size, move, col, obj);
 
 	//ÉeÉNÉXÉ`ÉÉÇÃì«Ç›çûÇ›
 	pBullet2D->Load();

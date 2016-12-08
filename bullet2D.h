@@ -30,12 +30,12 @@ public:
 	CBullet2D();
 	virtual ~CBullet2D();
 
-	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 move, const D3DXCOLOR &col, CScene::OBJTYPE obj);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 
-	static CBullet2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	static CBullet2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 move, const D3DXCOLOR &col, CScene::OBJTYPE obj);
 	static HRESULT Load(void);
 	static void Unload(void);
 

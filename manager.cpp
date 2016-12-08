@@ -19,6 +19,7 @@
 #include "enemy2D.h"
 #include "sound.h"
 #include "score.h"
+#include "life.h"
 
 //============================================
 // マクロ定義
@@ -26,8 +27,6 @@
 #define TEXTURE_BG00 "data/TEXTURE/bg100.png"
 #define TEXTURE_BG01 "data/TEXTURE/bg101.png"
 #define TEXTURE_BG02 "data/TEXTURE/bg102.png"
-
-#define MAX_LINE_ENEMY	(10)
 
 //============================================
 // 静的メンバー変数の初期化
@@ -37,6 +36,7 @@ CInputKeyboard *CManager::m_pInputKeyboard = NULL;
 CInputMouse *CManager::m_pInputMouse = NULL;
 CSound *CManager::m_pSound = NULL;
 CScore *CManager::m_pScore = NULL;
+CLife *CManager::m_pLife = NULL;
 //============================================
 //コンストラクタ
 //============================================
@@ -88,8 +88,10 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	CBg::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG02, 0.001);
 
 	//スコア
-	m_pScore = CScore::Create( D3DXVECTOR3(SCREEN_WIDTH/2, 35.0f, 0.0f), D3DXVECTOR3( 300.0f, 50.0f, 0.0f), 6, D3DXCOLOR( 0.5, 0.5f, 1.0f, 1.0f));
+	m_pScore = CScore::Create( D3DXVECTOR3(SCREEN_WIDTH - 150, 35.0f, 0.0f), D3DXVECTOR3( 300.0f, 50.0f, 0.0f), 6, D3DXCOLOR( 0.5, 0.5f, 1.0f, 1.0f));
 	
+	//ライフ
+	m_pLife = CLife::Create( D3DXVECTOR3( 100.0f, 35.0f, 0.0f), D3DXVECTOR3( 200.0f, 50.0f, 0.0f), 4, D3DXCOLOR( 1.0, 1.0f, 1.0f, 1.0f));
 
 	return S_OK;
 }
@@ -200,4 +202,12 @@ CSound *CManager::GetSound(void)
 CScore *CManager::GetScore(void)
 {
 	return m_pScore;
+}
+
+//=============================================================================
+//
+//=============================================================================
+CLife *CManager::GetLife(void)
+{
+	return m_pLife;
 }

@@ -15,6 +15,7 @@
 #include "renderer.h"
 #include "input.h"
 #include "enemy2D.h"
+#include "bullet2D.h"
 
 //============================================
 // マクロ定義
@@ -34,6 +35,7 @@
 
 #define ENEMY_SPEED_X	(3.0f)
 #define ENEMY_START_POSX	(100.0f)
+#define MAX_LINE_ENEMY	(10)
 
 //============================================
 // 静的メンバー変数の初期化
@@ -119,12 +121,13 @@ void CEnemy2D::Update(void)
 	//左右限界を更新
 	if( bHitWall == false)
 	{
-		if(pos.x < 0.0f || pos.x > SCREEN_WIDTH)
+		if(pos.x < 0.0f + size.x/2 || pos.x > SCREEN_WIDTH - size.x/2)
 		{
 			bHitWall = true;
 		}
 	}
 
+	//アニメーション
 	m_nCounterAnim++;
 	if( m_nCounterAnim >= TIME_CHANGE_PATTERN )
 	{
@@ -145,6 +148,13 @@ void CEnemy2D::Update(void)
 			//m_nCounterAnimのリセット
 			m_nCounterAnim = 0;
 		}
+	}
+
+	//弾を出す
+	int nRand = rand() % 1000;
+	if( nRand < 1)
+	{
+		CBullet2D::Create( pos, D3DXVECTOR3( 10.0f, 10.0f, 0.0f), D3DXVECTOR3( 0.0f, 5.0f, 0.0f), MASENTA(1.0f), CScene::OBJTYPE_BULLET_E);
 	}
 
 	//弾の移動更新
@@ -249,7 +259,7 @@ void CEnemy2D::CreateAllEnemy(void)
 {
 	m_fPosXRef = ENEMY_START_POSX;
 
-	for(int cntEnemy = 0; cntEnemy < 10; cntEnemy++)
+	for(int cntEnemy = 0; cntEnemy < MAX_LINE_ENEMY; cntEnemy++)
 	{
 		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_000);
 		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 150.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_001);
