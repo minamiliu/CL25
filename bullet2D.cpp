@@ -134,6 +134,10 @@ void CBullet2D::Update(void)
 					case CEnemy2D::TYPE_003:
 						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), BLUE(1.0f));
 						break;
+
+					case CEnemy2D::TYPE_004:
+						CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), GREEN(1.0f));
+						break;
 					}
 
 					//“G‚Ì”jŠü

@@ -33,6 +33,7 @@ public:
 		TYPE_001,
 		TYPE_002,
 		TYPE_003,
+		TYPE_004,
 		TYPE_MAX,
 	}TYPE;
 
@@ -49,13 +50,21 @@ public:
 	static CEnemy2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);
 	static HRESULT Load(void);
 	static void Unload(void);
+	static void CreateAllEnemy(void);
+	static void UpdateRefPos(void);
+	static void InitLeftRight(void);
 
 private:
 
 	static LPDIRECT3DTEXTURE9 m_pTexture[TYPE_MAX];
-	D3DXVECTOR3 m_move;
+	static float m_fPosXRef;
+	static bool bHitWall;
+	static D3DXVECTOR3 m_move;
+	
 	float m_fCntAngle;
 	TYPE m_type;
+	float m_fPosXDiff;
+
 
 	//アニメーション
 	int m_nCounterAnim;	// ポリゴンのアニメーションカウンター

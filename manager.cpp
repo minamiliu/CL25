@@ -27,6 +27,8 @@
 #define TEXTURE_BG01 "data/TEXTURE/bg101.png"
 #define TEXTURE_BG02 "data/TEXTURE/bg102.png"
 
+#define MAX_LINE_ENEMY	(10)
+
 //============================================
 // 静的メンバー変数の初期化
 //============================================
@@ -73,17 +75,12 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_pSound->Play( CSound::SOUND_LABEL_BGM001);
 
 	//プレイヤー
-	CPlayer2D::Create(D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
+	CPlayer2D::Create(D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 
 	//敵
 	CEnemy2D::Load();
-	for(int cntEnemy = 0; cntEnemy < 10; cntEnemy++)
-	{
-		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_000);
-		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 200.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_001);
-		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 300.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_002);
-		CEnemy2D::Create(D3DXVECTOR3( 100.0f + cntEnemy * 100.0f, 400.0f, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), CEnemy2D::TYPE_003);
-	}
+	CEnemy2D::CreateAllEnemy();
+
 
 	//背景
 	CBg::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG00, 0.005);
@@ -151,6 +148,9 @@ void CManager::Update()
 
 	//マウスの更新処理
 	m_pInputMouse->Update();
+
+	//すべての敵に参照座標の更新処理
+	CEnemy2D::UpdateRefPos();
 }
 
 //=============================================================================

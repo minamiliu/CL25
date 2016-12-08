@@ -23,19 +23,27 @@
 #define TEXTURE_ENEMY001 "data/TEXTURE/enemy001.png"
 #define TEXTURE_ENEMY002 "data/TEXTURE/enemy002.png"
 #define TEXTURE_ENEMY003 "data/TEXTURE/enemy003.png"
+#define TEXTURE_ENEMY004 "data/TEXTURE/enemy004.png"
 
 #define	TEX_PATTERN_DIVIDE_X		(2)								// アニメーションパターンのテクスチャ内での分割数(Ｘ方向)
 #define	TEX_PATTERN_DIVIDE_Y		(1)								// アニメーションパターンのテクスチャ内での分割数(Ｙ方向)
 #define	TEX_PATTERN_SIZE_X			(1.0f/TEX_PATTERN_DIVIDE_X)		// １パターンのテクスチャサイズ(Ｘ方向)(1.0f/X方向分割数)
 #define	TEX_PATTERN_SIZE_Y			(1.0f/TEX_PATTERN_DIVIDE_Y)		// １パターンのテクスチャサイズ(Ｙ方向)(1.0f/Y方向分割数)
-
 #define	NUM_ANIM_PATTERN			(TEX_PATTERN_DIVIDE_X*TEX_PATTERN_DIVIDE_Y)	// アニメーションのパターン数(X方向分割数×Y方向分割数)
 #define	TIME_CHANGE_PATTERN			(30)								// アニメーションの切り替わるタイミング(フレーム数)
+
+#define ENEMY_SPEED_X	(3.0f)
+#define ENEMY_START_POSX	(100.0f)
 
 //============================================
 // 静的メンバー変数の初期化
 //============================================
 LPDIRECT3DTEXTURE9 CEnemy2D::m_pTexture[CEnemy2D::TYPE_MAX] = {};
+D3DXVECTOR3 CEnemy2D::m_move = D3DXVECTOR3( ENEMY_SPEED_X, 0.0f, 0.0f);
+
+float CEnemy2D::m_fPosXRef =  0.0f;
+bool CEnemy2D::bHitWall = false;
+
 
 //=============================================================================
 // 構造体定義
@@ -46,8 +54,7 @@ LPDIRECT3DTEXTURE9 CEnemy2D::m_pTexture[CEnemy2D::TYPE_MAX] = {};
 //=============================================================================
 CEnemy2D::CEnemy2D()
 {
-	m_move = D3DXVECTOR3( 0.0f, 0.0f, 0.0f);
-	m_fCntAngle = 0;
+
 }
 
 //=============================================================================
@@ -68,10 +75,13 @@ HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 	CScene2D::Init(pos, size, D3DXVECTOR2(TEX_PATTERN_SIZE_X, TEX_PATTERN_SIZE_Y));
 	SetObjType( CScene::OBJTYPE_ENEMY);
 
+	//座標ずれ記録
+	m_fPosXDiff = pos.x - m_fPosXRef;
+
 	m_type = type;
-	m_move = D3DXVECTOR3( 5.0f, 0.0f, 0.0f);
 	m_nCounterAnim = 0;	// ポリゴンのアニメーションカウンター
 	m_nPatternAnim = 0;	// ポリゴンのアニメーションパターンNo.
+	m_fCntAngle = 0;
 
 	return S_OK;
 }
@@ -103,13 +113,17 @@ void CEnemy2D::Update(void)
 	m_fCntAngle += 0.1f;
 	m_fCntAngle = ( m_fCntAngle >= D3DX_PI * 2) ? 0.0f : m_fCntAngle; 
 
-	//壁に跳ね返す
-	//if( pos.x < size.x/2 || pos.x > SCREEN_WIDTH - size.x/2)
-	//{
-	//	m_move *= -1;
-	//}
+	//移動処理
+	pos.x = m_fPosXRef + m_fPosXDiff;
 
-	//pos += m_move;
+	//左右限界を更新
+	if( bHitWall == false)
+	{
+		if(pos.x < 0.0f || pos.x > SCREEN_WIDTH)
+		{
+			bHitWall = true;
+		}
+	}
 
 	m_nCounterAnim++;
 	if( m_nCounterAnim >= TIME_CHANGE_PATTERN )
@@ -150,14 +164,14 @@ void CEnemy2D::Draw(void)
 //=============================================================================
 CEnemy2D *CEnemy2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 {
-	CEnemy2D *pBullet2D;
-	pBullet2D = new CEnemy2D;
-	pBullet2D->Init(pos, size, type);
+	CEnemy2D *pEnemy;
+	pEnemy = new CEnemy2D;
+	pEnemy->Init(pos, size, type);
 
 	//テクスチャの割り当て
-	pBullet2D->BindTexture(m_pTexture[type]);
+	pEnemy->BindTexture(m_pTexture[type]);
 	
-	return pBullet2D;
+	return pEnemy;
 }
 
 //=============================================================================
@@ -185,6 +199,11 @@ HRESULT CEnemy2D::Load(void)
 		case TYPE_003:
 			strFileName = TEXTURE_ENEMY003;
 			break;
+
+		case TYPE_004:
+			strFileName = TEXTURE_ENEMY004;
+			break;
+
 		}
 
 		if( m_pTexture[cntType] == NULL)
@@ -226,3 +245,29 @@ CEnemy2D::TYPE CEnemy2D::GetType(void)
 	return m_type;
 }
 
+void CEnemy2D::CreateAllEnemy(void)
+{
+	m_fPosXRef = ENEMY_START_POSX;
+
+	for(int cntEnemy = 0; cntEnemy < 10; cntEnemy++)
+	{
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_000);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 150.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_001);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 200.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_002);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 250.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_003);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 300.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_004);
+	}
+}
+
+void CEnemy2D::UpdateRefPos(void)
+{
+	//壁に跳ね返す
+	if( bHitWall == true)
+	{
+		m_move *= -1;
+		bHitWall = false;
+	}
+
+	//座標基準更新
+	m_fPosXRef += m_move.x;
+}
