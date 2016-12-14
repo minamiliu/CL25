@@ -32,7 +32,7 @@ CNumber::CNumber()
 {
 	m_pTexture = NULL;		// テクスチャへのポインタ
 	m_pVtxBuff = NULL;		// 頂点バッファへのポインタ
-	m_pos = D3DXVECTOR3( 0.0f, 0.0f, 0.0f);			// ポリゴンの位置
+	m_pos = D3DXVECTOR3( 0.0f, 0.0f, 0.0f);			// ナンバーの位置
 	m_bLoadTexture = false;
 }
 
@@ -45,14 +45,14 @@ CNumber::~CNumber()
 }
 
 //=============================================================================
-// ポリゴンの初期化処理
+// ナンバーの初期化処理
 //=============================================================================
 HRESULT CNumber::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 {
 	LPDIRECT3DDEVICE9 pDevice;
 	pDevice = CManager::GetRenderer()->GetDevice();
 
-	// ポリゴンの情報を設置
+	// ナンバーの情報を設置
 	m_pos = pos;
 	m_size = size;
 	m_bLoadTexture = false;
@@ -75,7 +75,7 @@ HRESULT CNumber::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
 	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
 
-	// ポリゴンの位置を設定
+	// ナンバーの位置を設定
 	pVtx[0].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
 	pVtx[1].pos = D3DXVECTOR3(m_pos.x + (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
 	pVtx[2].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y + (m_size.y/2), 0.0f);
@@ -106,7 +106,7 @@ HRESULT CNumber::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 
 
 //=============================================================================
-// ポリゴンの終了処理
+// ナンバーの終了処理
 //=============================================================================
 void CNumber::Uninit(void)
 {
@@ -127,7 +127,7 @@ void CNumber::Uninit(void)
 
 
 //=============================================================================
-// ポリゴンの更新処理
+// ナンバーの更新処理
 //=============================================================================
 void CNumber::Update(void)
 {
@@ -135,7 +135,7 @@ void CNumber::Update(void)
 }
 
 //=============================================================================
-// ポリゴンの描画処理
+// ナンバーの描画処理
 //=============================================================================
 void CNumber::Draw(void)
 {
@@ -151,16 +151,16 @@ void CNumber::Draw(void)
 	// テクスチャの設定
 	pDevice->SetTexture(0, m_pTexture);
 
-	// ポリゴンの描画
+	// ナンバーの描画
 	pDevice->DrawPrimitive(
 		D3DPT_TRIANGLESTRIP,	//プリミティブの種類
 		0,						//ロードする最初の頂点インデックス
-		NUM_POLYGON				//ポリゴンの数
+		NUM_POLYGON				//ナンバーの数
 	);
 }
 
 //=============================================================================
-// ポリゴンの生成処理
+// ナンバーの生成処理
 //=============================================================================
 CNumber *CNumber::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 {
@@ -175,7 +175,7 @@ CNumber *CNumber::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 }
 
 //=============================================================================
-// ポリゴンの座標設置
+// ナンバーの座標設置
 //=============================================================================
 void CNumber::SetPosition(D3DXVECTOR3 pos)
 {
@@ -187,7 +187,7 @@ void CNumber::SetPosition(D3DXVECTOR3 pos)
 	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
 	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
 
-	// ポリゴンの位置を設定
+	// ナンバーの位置を設定
 	pVtx[0].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
 	pVtx[1].pos = D3DXVECTOR3(m_pos.x + (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
 	pVtx[2].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y + (m_size.y/2), 0.0f);
@@ -197,7 +197,7 @@ void CNumber::SetPosition(D3DXVECTOR3 pos)
 }
 
 //=============================================================================
-// ポリゴンの座標取得
+// ナンバーの座標取得
 //=============================================================================
 D3DXVECTOR3 CNumber::GetPosition(void)
 {
@@ -205,7 +205,7 @@ D3DXVECTOR3 CNumber::GetPosition(void)
 }
 
 //=============================================================================
-// ポリゴンのテクスチャを割り当てる
+// ナンバーのテクスチャを割り当てる
 //=============================================================================
 void CNumber::BindTexture( LPDIRECT3DTEXTURE9 pTexture)
 {
@@ -242,7 +242,7 @@ void CNumber::ChangeTextureAnime( int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVEC
 }
 
 //=============================================================================
-//ポリゴンのサイズを取得
+//ナンバーのサイズを取得
 //=============================================================================
 D3DXVECTOR3 CNumber::GetSize(void)
 {

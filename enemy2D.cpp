@@ -16,6 +16,7 @@
 #include "input.h"
 #include "enemy2D.h"
 #include "bullet2D.h"
+#include "explosion2D.h"
 
 //============================================
 // マクロ定義
@@ -36,6 +37,7 @@
 #define ENEMY_SPEED_X	(3.0f)
 #define ENEMY_START_POSX	(100.0f)
 #define MAX_LINE_ENEMY	(10)
+#define FRAME_DAMAGE	(20)
 
 //============================================
 // 静的メンバー変数の初期化
@@ -69,21 +71,26 @@ CEnemy2D::~CEnemy2D()
 
 
 //=============================================================================
-// ポリゴンの初期化処理
+// 敵の初期化処理
 //=============================================================================
 
-HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
+HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, int nLife)
 {
 	CScene2D::Init(pos, size, D3DXVECTOR2(TEX_PATTERN_SIZE_X, TEX_PATTERN_SIZE_Y));
 	SetObjType( CScene::OBJTYPE_ENEMY);
 
-	//座標ずれ記録
-	m_fPosXDiff = pos.x - m_fPosXRef;
+	
+	m_fPosXDiff = pos.x - m_fPosXRef; //座標ずれ記録
 
 	m_type = type;
-	m_nCounterAnim = 0;	// ポリゴンのアニメーションカウンター
-	m_nPatternAnim = 0;	// ポリゴンのアニメーションパターンNo.
-	m_fCntAngle = 0;
+	m_nLife = nLife;				//ライフ
+	m_state = STATE_NORMAL;		//状態
+	
+	m_nCntState = 0;	//状態のカウンター
+	m_nCounterAnim = 0;	// 敵のアニメーションカウンター
+	m_nPatternAnim = 0;	// 敵のアニメーションパターンNo.
+	m_fCntShake = 0;
+
 
 	return S_OK;
 }
@@ -92,7 +99,7 @@ HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 
 
 //=============================================================================
-// ポリゴンの終了処理
+// 敵の終了処理
 //=============================================================================
 void CEnemy2D::Uninit(void)
 {
@@ -101,19 +108,17 @@ void CEnemy2D::Uninit(void)
 
 
 //=============================================================================
-// ポリゴンの更新処理
+// 敵の更新処理
 //=============================================================================
 void CEnemy2D::Update(void)
 {
-	CScene2D::Update();
-
 	D3DXVECTOR3 size = CScene2D::GetSize();
 	D3DXVECTOR3 pos = CScene2D::GetPosition();
 
 	//揺れる処理
-	pos.y += sinf(m_fCntAngle) * 1.0f;
-	m_fCntAngle += 0.1f;
-	m_fCntAngle = ( m_fCntAngle >= D3DX_PI * 2) ? 0.0f : m_fCntAngle; 
+	pos.y += sinf(m_fCntShake) * 1.0f;
+	m_fCntShake += 0.1f;
+	m_fCntShake = ( m_fCntShake >= D3DX_PI * 2) ? 0.0f : m_fCntShake; 
 
 	//移動処理
 	pos.x = m_fPosXRef + m_fPosXDiff;
@@ -157,12 +162,26 @@ void CEnemy2D::Update(void)
 		CBullet2D::Create( pos, D3DXVECTOR3( 10.0f, 10.0f, 0.0f), D3DXVECTOR3( 0.0f, 5.0f, 0.0f), MASENTA(1.0f), CScene::OBJTYPE_BULLET_E);
 	}
 
+	//状態の更新
+	switch( m_state)
+	{
+	case STATE_DAMAGE:
+		m_nCntState--;
+		if( m_nCntState <= 0)
+		{
+			m_state = STATE_NORMAL;
+			//色を元に戻す
+			this->SetColor( WHITE(1.0f));
+		}
+		break;
+	}
+
 	//弾の移動更新
 	CScene2D::SetPosition(pos);
 }
 
 //=============================================================================
-// ポリゴンの描画処理
+// 敵の描画処理
 //=============================================================================
 void CEnemy2D::Draw(void)
 {
@@ -170,13 +189,13 @@ void CEnemy2D::Draw(void)
 }
 
 //=============================================================================
-// ポリゴンの生成処理
+// 敵の生成処理
 //=============================================================================
-CEnemy2D *CEnemy2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
+CEnemy2D *CEnemy2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, int nLife)
 {
 	CEnemy2D *pEnemy;
 	pEnemy = new CEnemy2D;
-	pEnemy->Init(pos, size, type);
+	pEnemy->Init(pos, size, type, nLife);
 
 	//テクスチャの割り当て
 	pEnemy->BindTexture(m_pTexture[type]);
@@ -185,7 +204,7 @@ CEnemy2D *CEnemy2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type)
 }
 
 //=============================================================================
-//
+//テクスチャのロード
 //=============================================================================
 HRESULT CEnemy2D::Load(void)
 {
@@ -231,7 +250,7 @@ HRESULT CEnemy2D::Load(void)
 }
 
 //=============================================================================
-//
+//テクスチャのアンロード
 //=============================================================================
 void CEnemy2D::Unload(void)
 {
@@ -248,27 +267,31 @@ void CEnemy2D::Unload(void)
 }
 
 //=============================================================================
-//
+//敵の種類を取得
 //=============================================================================
 CEnemy2D::TYPE CEnemy2D::GetType(void)
 {
 	return m_type;
 }
-
+//=============================================================================
+//敵全体の生成(ステージ0)
+//=============================================================================
 void CEnemy2D::CreateAllEnemy(void)
 {
 	m_fPosXRef = ENEMY_START_POSX;
 
 	for(int cntEnemy = 0; cntEnemy < MAX_LINE_ENEMY; cntEnemy++)
 	{
-		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_000);
-		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 150.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_001);
-		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 200.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_002);
-		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 250.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_003);
-		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 300.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), CEnemy2D::TYPE_004);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 100.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), TYPE_000, 5);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 150.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), TYPE_001, 4);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 200.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), TYPE_002, 3);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 250.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), TYPE_003, 2);
+		CEnemy2D::Create(D3DXVECTOR3( ENEMY_START_POSX + cntEnemy * 100.0f, 300.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f), TYPE_004, 1);
 	}
 }
-
+//=============================================================================
+//敵全体の基準座標の更新処理
+//=============================================================================
 void CEnemy2D::UpdateRefPos(void)
 {
 	//壁に跳ね返す
@@ -280,4 +303,53 @@ void CEnemy2D::UpdateRefPos(void)
 
 	//座標基準更新
 	m_fPosXRef += m_move.x;
+}
+//=============================================================================
+//敵のダメージ処理
+//=============================================================================
+bool CEnemy2D::Hit(int nDamage)
+{
+	m_nLife -= nDamage;
+	if( m_nLife <= 0)
+	{
+		D3DXVECTOR3 posEnemy = GetPosition();
+
+		//色付けの爆風の生成
+		switch( m_type)
+		{
+		case TYPE_000:
+			CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), RED(1.0f));
+			break;
+
+		case TYPE_001:
+			CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), WHITE(1.0f));
+			break;
+
+		case TYPE_002:
+			CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), GRAY(1.0f));
+			break;
+
+		case TYPE_003:
+			CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), BLUE(1.0f));
+			break;
+
+		case TYPE_004:
+			CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), GREEN(1.0f));
+			break;
+		}
+
+		//敵の破棄
+		this->Uninit();
+
+		return true;
+	}
+	else
+	{
+		m_state = STATE_DAMAGE;
+		m_nCntState = FRAME_DAMAGE;
+
+		//色をダメージ色に変更
+		this->SetColor( RED(1.0f));
+	}
+	return false;
 }

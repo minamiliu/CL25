@@ -46,6 +46,7 @@ public:
 	static void ReleaseAll(void);
 
 	virtual D3DXVECTOR3 GetPosition(void) = 0;
+	virtual D3DXVECTOR3 GetSize(void) = 0;
 
 	void SetObjType(OBJTYPE type);
 	OBJTYPE GetObjType(void);

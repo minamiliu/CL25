@@ -25,6 +25,8 @@
 #define TEXTURENAME "data/TEXTURE/player000.png"
 
 #define PLAYER_SPEED (5.0f)
+#define PLAYER_LIFE	(4)
+#define FRAME_DAMAGE	(20)
 
 //=============================================================================
 // 構造体定義
@@ -48,13 +50,17 @@ CPlayer2D::~CPlayer2D()
 
 
 //=============================================================================
-// ポリゴンの初期化処理
+// プレイヤーの初期化処理
 //=============================================================================
 
 HRESULT CPlayer2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 {
 	CScene2D::Init(pos, size);
 	SetObjType( CScene::OBJTYPE_PLAYER);
+
+	m_state = STATE_START;		//状態
+	m_nCntState = 60;	//状態のカウンター
+	m_bUse = true;
 
 	return S_OK;
 }
@@ -63,7 +69,7 @@ HRESULT CPlayer2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 
 
 //=============================================================================
-// ポリゴンの終了処理
+// プレイヤーの終了処理
 //=============================================================================
 void CPlayer2D::Uninit(void)
 {
@@ -72,7 +78,7 @@ void CPlayer2D::Uninit(void)
 
 
 //=============================================================================
-// ポリゴンの更新処理
+// プレイヤーの更新処理
 //=============================================================================
 void CPlayer2D::Update(void)
 {
@@ -135,71 +141,91 @@ void CPlayer2D::Update(void)
 
 
 	//弾との当たり判定
-	for( int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
+	if( m_state == STATE_NORMAL)
 	{
-		CScene *pScene;
-		pScene = CScene::GetScene( nCntScene);
-		
-		if( pScene != NULL)
+		for( int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
 		{
-			CScene::OBJTYPE type;
-			type = pScene->GetObjType();
-
-			if( type == CScene::OBJTYPE_BULLET_E)
+			CScene *pScene;
+			pScene = CScene::GetScene( nCntScene);
+		
+			if( pScene != NULL)
 			{
-				D3DXVECTOR3 posBullet, posPlayer;
-				posBullet = pScene->GetPosition();
-				posPlayer = this->GetPosition();
+				CScene::OBJTYPE type;
+				type = pScene->GetObjType();
 
-				if( sqrt( (posPlayer.x - posBullet.x)*(posPlayer.x - posBullet.x) + (posPlayer.y - posBullet.y)*(posPlayer.y - posBullet.y)  ) < 50.0f)
+				if( type == CScene::OBJTYPE_BULLET_E)
 				{
-					//爆風
-					CExplosion2D::Create( posPlayer, D3DXVECTOR3(100.0f, 100.0f, 0.0f), YELLOW(1.0f));
+					//座標
+					D3DXVECTOR3 posPlayer, posBullet;
+					posBullet = pScene->GetPosition();
+					posPlayer = this->GetPosition();
 
-					//弾の破棄
- 					pScene->Uninit();
+					//サイズ
+					D3DXVECTOR3 sizePlayer, sizeBullet;
+					sizeBullet = pScene->GetSize();
+					sizePlayer = this->GetSize();
 
-					//ライフ
-					CManager::GetLife()->MinusLife();
-					
-					//return;
+					//当たり判定
+					if(	   posBullet.x > posPlayer.x - sizePlayer.x/2.0f 
+						&& posBullet.x < posPlayer.x + sizePlayer.x/2.0f 
+						&& posBullet.y > posPlayer.y - sizePlayer.y/2.0f  
+						&& posBullet.y < posPlayer.y + sizePlayer.y/2.0f 
+						)
+					{
+						//弾の破棄
+						((CBullet2D*)pScene)->Uninit();
+
+						//ダメージ処理
+						this->Hit();
+
+						//return;
+					}
 				}
 			}
-		}
+		}	
 	}
 
-	//復活
-	if( CManager::GetLife()->GetLife() <= 0)
+
+	//状態の更新
+	switch( m_state)
 	{
-		Init( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
-		CManager::GetLife()->Init( D3DXVECTOR3( 100.0f, 35.0f, 0.0f), D3DXVECTOR3( 200.0f, 50.0f, 0.0f), 4, D3DXCOLOR( 1.0, 1.0f, 1.0f, 1.0f));
+	case STATE_DAMAGE:
+		m_nCntState--;
+		if( m_nCntState <= 0)
+		{
+			m_state = STATE_NORMAL;
+			//色を元に戻す
+			this->SetColor( WHITE(1.0f));
+		}
+		break;
+	case STATE_START:
+		m_nCntState--;
+		if( m_nCntState <= 0)
+		{
+			m_state = STATE_NORMAL;
+			m_bUse = true;
+		}
+		else if( m_nCntState % 3 == 0)
+		{
+			m_bUse = !m_bUse;
+		}
+		break;
 	}
-
-	
-	//マウス操作
-	//int mouseMoveX = pInputMouse->GetMouseAxisX();
-	//if( mouseMoveX != 0)
-	//{
-	//	pos.x += mouseMoveX;
-	//	SetPosition(pos);
-	//}
-
-	//if(pInputMouse->GetMouseLeftTrigger())
-	//{
-	//	CBullet2D::Create(pos, D3DXVECTOR3( 20.0f, 20.0f, 0.0f));
-	//}
 }
 
 //=============================================================================
-// ポリゴンの描画処理
+// プレイヤーの描画処理
 //=============================================================================
 void CPlayer2D::Draw(void)
 {
-	CScene2D::Draw();
+	if( m_bUse)
+	{
+		CScene2D::Draw();
+	}
 }
 
 //=============================================================================
-// ポリゴンの生成処理
+// プレイヤーの生成処理
 //=============================================================================
 CPlayer2D *CPlayer2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 {
@@ -211,5 +237,35 @@ CPlayer2D *CPlayer2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	pPlayer2D->Load( TEXTURENAME);
 	
 	return pPlayer2D;
+}
+//=============================================================================
+// ダメージ処理
+//=============================================================================
+bool CPlayer2D::Hit(void)
+{
+	D3DXVECTOR3 pos = this->GetPosition();
+
+	//爆風
+	CExplosion2D::Create( pos, D3DXVECTOR3(100.0f, 100.0f, 0.0f), YELLOW(1.0f));
+
+	//ライフ
+	CManager::GetLife()->MinusLife();
+
+	if( CManager::GetLife()->GetLife() <= 0)
+	{
+		//復活
+		Init( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+		CManager::GetLife()->Init( D3DXVECTOR3( 100.0f, 35.0f, 0.0f), D3DXVECTOR3( 200.0f, 50.0f, 0.0f), PLAYER_LIFE, D3DXCOLOR( 1.0, 1.0f, 1.0f, 1.0f));	
+		return false;
+	}
+	else
+	{
+		//ダメージ状態に設定
+		m_state = STATE_DAMAGE;
+		m_nCntState = FRAME_DAMAGE;
+		this->SetColor(RED(1.0f));
+	}
+				
+	return true;
 }
 

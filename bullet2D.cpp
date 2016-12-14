@@ -23,7 +23,7 @@
 // マクロ定義
 //============================================
 #define TEXTURENAME "data/TEXTURE/bullet000.png"
-
+#define BULLET_DAMAGE	(1)
 //============================================
 // 静的メンバー変数の初期化
 //============================================
@@ -51,7 +51,7 @@ CBullet2D::~CBullet2D()
 
 
 //=============================================================================
-// ポリゴンの初期化処理
+// 弾の初期化処理
 //=============================================================================
 
 HRESULT CBullet2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 move, const D3DXCOLOR &col, CScene::OBJTYPE obj)
@@ -70,7 +70,7 @@ HRESULT CBullet2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 move, con
 
 
 //=============================================================================
-// ポリゴンの終了処理
+// 弾の終了処理
 //=============================================================================
 void CBullet2D::Uninit(void)
 {
@@ -79,7 +79,7 @@ void CBullet2D::Uninit(void)
 
 
 //=============================================================================
-// ポリゴンの更新処理
+// 弾の更新処理
 //=============================================================================
 void CBullet2D::Update(void)
 {
@@ -113,38 +113,24 @@ void CBullet2D::Update(void)
 
 				if( type == CScene::OBJTYPE_ENEMY)
 				{
+					//座標
 					D3DXVECTOR3 posEnemy, posBullet;
 					posEnemy = pScene->GetPosition();
 					posBullet = this->GetPosition();
 
-					if( sqrt( (posEnemy.x - posBullet.x)*(posEnemy.x - posBullet.x) + (posEnemy.y - posBullet.y)*(posEnemy.y - posBullet.y)  ) < 50.0f)
+					//サイズ
+					D3DXVECTOR3 sizeEnemy, sizeBullet;
+					sizeEnemy = pScene->GetSize();
+					sizeBullet = this->GetSize();
+
+					//当たり判定
+					if(	   posBullet.x > posEnemy.x - sizeEnemy.x/2.0f 
+						&& posBullet.x < posEnemy.x + sizeEnemy.x/2.0f 
+						&& posBullet.y > posEnemy.y - sizeEnemy.y/2.0f  
+						&& posBullet.y < posEnemy.y + sizeEnemy.y/2.0f 
+						)
 					{
-						//爆風の色付け
-						switch( ((CEnemy2D*)pScene)->GetType())
-						{
-						case CEnemy2D::TYPE_000:
-							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), RED(1.0f));
-							break;
-
-						case CEnemy2D::TYPE_001:
-							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), WHITE(1.0f));
-							break;
-
-						case CEnemy2D::TYPE_002:
-							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), GRAY(1.0f));
-							break;
-
-						case CEnemy2D::TYPE_003:
-							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), BLUE(1.0f));
-							break;
-
-						case CEnemy2D::TYPE_004:
-							CExplosion2D::Create( posEnemy, D3DXVECTOR3(100.0f, 100.0f, 0.0f), GREEN(1.0f));
-							break;
-						}
-
-						//敵の破棄
- 						pScene->Uninit();
+						((CEnemy2D*)pScene)->Hit( BULLET_DAMAGE);
 
 						//弾(自分)の破棄
 						this->Uninit();
@@ -162,7 +148,7 @@ void CBullet2D::Update(void)
 }
 
 //=============================================================================
-// ポリゴンの描画処理
+// 弾の描画処理
 //=============================================================================
 void CBullet2D::Draw(void)
 {
@@ -170,7 +156,7 @@ void CBullet2D::Draw(void)
 }
 
 //=============================================================================
-// ポリゴンの生成処理
+// 弾の生成処理
 //=============================================================================
 CBullet2D *CBullet2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 move, const D3DXCOLOR &col, CScene::OBJTYPE obj)
 {
@@ -188,7 +174,7 @@ CBullet2D *CBullet2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 move
 }
 
 //=============================================================================
-//
+//テクスチャのロード
 //=============================================================================
 HRESULT CBullet2D::Load(void)
 {
@@ -205,7 +191,7 @@ HRESULT CBullet2D::Load(void)
 }
 
 //=============================================================================
-//
+//テクスチャのアンロード
 //=============================================================================
 void CBullet2D::Unload(void)
 {

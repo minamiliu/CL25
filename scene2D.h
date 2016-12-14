@@ -64,7 +64,7 @@ public:
 
 protected:
 	void ChangeTextureAnime( int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECTOR2 ptnDivide); //アニメーション
-	void SetTexture( D3DXVECTOR2 speed);
+	void SetTexture( D3DXVECTOR2 tex0, D3DXVECTOR2 tex1, D3DXVECTOR2 tex2, D3DXVECTOR2 tex3);
 
 private:
 

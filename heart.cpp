@@ -31,7 +31,7 @@ CHeart::CHeart()
 {
 	m_pTexture = NULL;		// テクスチャへのポインタ
 	m_pVtxBuff = NULL;		// 頂点バッファへのポインタ
-	m_pos = D3DXVECTOR3( 0.0f, 0.0f, 0.0f);			// ポリゴンの位置
+	m_pos = D3DXVECTOR3( 0.0f, 0.0f, 0.0f);			// ハートの位置
 	m_bLoadTexture = false;
 }
 
@@ -44,14 +44,14 @@ CHeart::~CHeart()
 }
 
 //=============================================================================
-// ポリゴンの初期化処理
+// ハートの初期化処理
 //=============================================================================
 HRESULT CHeart::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 {
 	LPDIRECT3DDEVICE9 pDevice;
 	pDevice = CManager::GetRenderer()->GetDevice();
 
-	// ポリゴンの情報を設置
+	// ハートの情報を設置
 	m_pos = pos;
 	m_size = size;
 	m_bLoadTexture = false;
@@ -74,7 +74,7 @@ HRESULT CHeart::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
 	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
 
-	// ポリゴンの位置を設定
+	// ハートの位置を設定
 	pVtx[0].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
 	pVtx[1].pos = D3DXVECTOR3(m_pos.x + (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
 	pVtx[2].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y + (m_size.y/2), 0.0f);
@@ -105,7 +105,7 @@ HRESULT CHeart::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 
 
 //=============================================================================
-// ポリゴンの終了処理
+// ハートの終了処理
 //=============================================================================
 void CHeart::Uninit(void)
 {
@@ -126,7 +126,7 @@ void CHeart::Uninit(void)
 
 
 //=============================================================================
-// ポリゴンの更新処理
+// ハートの更新処理
 //=============================================================================
 void CHeart::Update(void)
 {
@@ -134,7 +134,7 @@ void CHeart::Update(void)
 }
 
 //=============================================================================
-// ポリゴンの描画処理
+// ハートの描画処理
 //=============================================================================
 void CHeart::Draw(void)
 {
@@ -150,16 +150,16 @@ void CHeart::Draw(void)
 	// テクスチャの設定
 	pDevice->SetTexture(0, m_pTexture);
 
-	// ポリゴンの描画
+	// ハートの描画
 	pDevice->DrawPrimitive(
 		D3DPT_TRIANGLESTRIP,	//プリミティブの種類
 		0,						//ロードする最初の頂点インデックス
-		NUM_POLYGON				//ポリゴンの数
+		NUM_POLYGON				//ハートの数
 	);
 }
 
 //=============================================================================
-// ポリゴンの生成処理
+// ハートの生成処理
 //=============================================================================
 CHeart *CHeart::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 {
@@ -174,7 +174,7 @@ CHeart *CHeart::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR2 ptnSize)
 }
 
 //=============================================================================
-// ポリゴンの座標設置
+// ハートの座標設置
 //=============================================================================
 void CHeart::SetPosition(D3DXVECTOR3 pos)
 {
@@ -186,7 +186,7 @@ void CHeart::SetPosition(D3DXVECTOR3 pos)
 	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
 	m_pVtxBuff->Lock( 0, 0, (void**)&pVtx, 0);
 
-	// ポリゴンの位置を設定
+	// ハートの位置を設定
 	pVtx[0].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
 	pVtx[1].pos = D3DXVECTOR3(m_pos.x + (m_size.x/2), m_pos.y - (m_size.y/2), 0.0f);
 	pVtx[2].pos = D3DXVECTOR3(m_pos.x - (m_size.x/2), m_pos.y + (m_size.y/2), 0.0f);
@@ -196,7 +196,7 @@ void CHeart::SetPosition(D3DXVECTOR3 pos)
 }
 
 //=============================================================================
-// ポリゴンの座標取得
+// ハートの座標取得
 //=============================================================================
 D3DXVECTOR3 CHeart::GetPosition(void)
 {
@@ -204,7 +204,7 @@ D3DXVECTOR3 CHeart::GetPosition(void)
 }
 
 //=============================================================================
-// ポリゴンのテクスチャを割り当てる
+// ハートのテクスチャを割り当てる
 //=============================================================================
 void CHeart::BindTexture( LPDIRECT3DTEXTURE9 pTexture)
 {
@@ -241,7 +241,7 @@ void CHeart::ChangeTextureAnime( int nPatternAnim, D3DXVECTOR2 ptnSize, D3DXVECT
 }
 
 //=============================================================================
-//ポリゴンのサイズを取得
+//ハートのサイズを取得
 //=============================================================================
 D3DXVECTOR3 CHeart::GetSize(void)
 {

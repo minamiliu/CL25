@@ -27,6 +27,14 @@ class CPlayer2D : public CScene2D
 {
 public:
 
+	typedef enum
+	{
+		STATE_NORMAL = 0,
+		STATE_START,
+		STATE_DAMAGE,
+		STATE_MAX,
+	}STATE;
+
 	CPlayer2D();
 	virtual ~CPlayer2D();
 
@@ -37,9 +45,14 @@ public:
 
 	static CPlayer2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
 
+	bool Hit(void);
+
 
 private:
-
+	
+	bool m_bUse;
+	STATE m_state;		//状態
+	int m_nCntState;	//状態のカウンター
 };
 
 #endif

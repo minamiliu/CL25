@@ -1,9 +1,9 @@
 //============================================
 //
 // ƒ^ƒCƒgƒ‹:	 –¢—ˆ‘n‘¢“Wƒ`[ƒ€204
-// ƒvƒƒOƒ‰ƒ€–¼: scene2D.cpp
+// ƒvƒƒOƒ‰ƒ€–¼: bg.cpp
 // ì¬ŽÒ:		 HAL“Œ‹žƒQ[ƒ€Šw‰È@—«“ìG
-// ì¬“ú:       2016/10/19
+// ì¬“ú:       2016/12/07
 //
 //============================================
 
@@ -41,7 +41,7 @@ CBg::~CBg()
 
 
 //=============================================================================
-// ƒ|ƒŠƒSƒ“‚Ì‰Šú‰»ˆ—
+// ”wŒi‚Ì‰Šú‰»ˆ—
 //=============================================================================
 HRESULT CBg::Init(void)
 {
@@ -59,7 +59,7 @@ HRESULT CBg::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, float speed)
 }
 
 //=============================================================================
-// ƒ|ƒŠƒSƒ“‚ÌI—¹ˆ—
+// ”wŒi‚ÌI—¹ˆ—
 //=============================================================================
 void CBg::Uninit(void)
 {
@@ -68,15 +68,13 @@ void CBg::Uninit(void)
 
 
 //=============================================================================
-// ƒ|ƒŠƒSƒ“‚ÌXVˆ—
+// ”wŒi‚ÌXVˆ—
 //=============================================================================
 void CBg::Update(void)
 {
-	CScene2D::Update();
+	CInputKeyboard *pInputKeyboard = CManager::GetInputKeyboard();
 
 	m_scroll.y -= m_fSpeed;
-
-	CInputKeyboard *pInputKeyboard = CManager::GetInputKeyboard();
 
 	//ˆÚ“®
 	if(pInputKeyboard->GetKeyPress(DIK_A))
@@ -87,12 +85,12 @@ void CBg::Update(void)
 	{
 		m_scroll.x += m_fSpeed;
 	}
-
-	SetTexture( m_scroll);
+	
+	SetScroll( m_scroll);
 }
 
 //=============================================================================
-// ƒ|ƒŠƒSƒ“‚Ì•`‰æˆ—
+// ”wŒi‚Ì•`‰æˆ—
 //=============================================================================
 void CBg::Draw(void)
 {
@@ -100,7 +98,7 @@ void CBg::Draw(void)
 }
 
 //=============================================================================
-// ƒ|ƒŠƒSƒ“‚Ì¶¬ˆ—
+// ”wŒi‚Ì¶¬ˆ—
 //=============================================================================
 CBg *CBg::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, LPCSTR strFileName, float speed)
 {
@@ -112,4 +110,18 @@ CBg *CBg::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, LPCSTR strFileName, float sp
 	pBg->Load( strFileName);
 
 	return pBg;
+}
+//=============================================================================
+// ƒXƒNƒ[ƒ‹
+//=============================================================================
+void CBg::SetScroll(D3DXVECTOR2 scroll)
+{
+	D3DXVECTOR2 tex[4];
+
+	tex[0] = D3DXVECTOR2(scroll.x + 0.0F, scroll.y + 0.0F);
+	tex[1] = D3DXVECTOR2(scroll.x + 1.0F, scroll.y + 0.0F);
+	tex[2] = D3DXVECTOR2(scroll.x + 0.0F, scroll.y + 1.0F);
+	tex[3] = D3DXVECTOR2(scroll.x + 1.0F, scroll.y + 1.0F);
+
+	this->SetTexture( tex[0], tex[1], tex[2], tex[3]);
 }

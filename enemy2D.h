@@ -37,17 +37,26 @@ public:
 		TYPE_MAX,
 	}TYPE;
 
+	typedef enum
+	{
+		STATE_NORMAL = 0,
+		STATE_DAMAGE,
+		STATE_MAX,
+	}STATE;
+
 	CEnemy2D();
 	virtual ~CEnemy2D();
 
-	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);
+	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, int nLife);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 	
 	TYPE GetType(void);
+	bool Hit(int nDamage);
 
-	static CEnemy2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type);
+	//静的関数
+	static CEnemy2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, int nLife);
 	static HRESULT Load(void);
 	static void Unload(void);
 	static void CreateAllEnemy(void);
@@ -60,10 +69,13 @@ private:
 	static bool bHitWall;
 	static D3DXVECTOR3 m_move;
 	
-	float m_fCntAngle;
-	TYPE m_type;
-	float m_fPosXDiff;
+	float m_fCntShake;	//揺れ処理のカウンター
+	float m_fPosXDiff;	//座標のずれ
+	TYPE m_type;		//敵の種類
 
+	int m_nLife;		//ライフ
+	STATE m_state;		//状態
+	int m_nCntState;	//状態のカウンター
 
 	//アニメーション
 	int m_nCounterAnim;	// ポリゴンのアニメーションカウンター

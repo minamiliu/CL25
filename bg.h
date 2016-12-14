@@ -36,7 +36,8 @@ public:
 	void Draw(void);
 	
 	static CBg *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, LPCSTR strFileName, float speed);
-
+protected:
+	void SetScroll(D3DXVECTOR2 scroll);
 
 private:
 	D3DXVECTOR2 m_scroll;
