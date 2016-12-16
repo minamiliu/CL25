@@ -307,7 +307,7 @@ D3DXVECTOR3 CScene2D::GetSize(void)
 //=============================================================================
 //色を変更
 //=============================================================================
-void CScene2D::SetColor(const D3DXCOLOR &col)
+void CScene2D::SetColor(D3DXCOLOR col)
 {
 	// 頂点情報を設定
 	VERTEX_2D *pVtx;
@@ -343,4 +343,11 @@ void CScene2D::SetTexture( D3DXVECTOR2 tex0, D3DXVECTOR2 tex1, D3DXVECTOR2 tex2,
 
 	// 頂点データをアンロックする
 	m_pVtxBuff->Unlock();
+}
+//=============================================================================
+//サイズの設定
+//=============================================================================
+void CScene2D::SetSize(D3DXVECTOR3 size)
+{
+	m_size = size;
 }

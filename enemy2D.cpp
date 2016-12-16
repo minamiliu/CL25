@@ -91,7 +91,6 @@ HRESULT CEnemy2D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, TYPE type, int nLife)
 	m_nPatternAnim = 0;	// 敵のアニメーションパターンNo.
 	m_fCntShake = 0;
 
-
 	return S_OK;
 }
 

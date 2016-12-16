@@ -20,6 +20,8 @@
 #include "sound.h"
 #include "score.h"
 #include "life.h"
+#include "bullet2D.h"
+#include "effect.h"
 
 //============================================
 // マクロ定義
@@ -74,13 +76,16 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_pSound->Init( hWnd);
 	m_pSound->Play( CSound::SOUND_LABEL_BGM001);
 
+	//テクスチャのロード
+	CEnemy2D::Load();
+	CBullet2D::Load();
+	CEffect::Load();
+
 	//プレイヤー
 	CPlayer2D::Create(D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT - 100.0f, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 
 	//敵
-	CEnemy2D::Load();
 	CEnemy2D::CreateAllEnemy();
-
 
 	//背景
 	CBg::Create( D3DXVECTOR3(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), TEXTURE_BG00, 0.005);

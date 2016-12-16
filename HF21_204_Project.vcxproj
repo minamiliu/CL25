@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="bg.cpp" />
     <ClCompile Include="bullet2D.cpp" />
+    <ClCompile Include="effect.cpp" />
     <ClCompile Include="enemy2D.cpp" />
     <ClCompile Include="explosion2D.cpp" />
     <ClCompile Include="input.cpp" />
@@ -98,6 +99,7 @@
   <ItemGroup>
     <ClInclude Include="bg.h" />
     <ClInclude Include="bullet2D.h" />
+    <ClInclude Include="effect.h" />
     <ClInclude Include="enemy2D.h" />
     <ClInclude Include="explosion2D.h" />
     <ClInclude Include="input.h" />

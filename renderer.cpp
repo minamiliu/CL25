@@ -113,9 +113,10 @@ HRESULT CRenderer::Init(HWND hWnd, bool bWindow)
 	m_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);	// テクスチャ縮小時の補間設定
 
 	// テクスチャステージステートの設定
-	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);	// アルファブレンディング処理(初期値はD3DTOP_SELECTARG1)
+	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);		// アルファブレンディング処理(初期値はD3DTOP_SELECTARG1)
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);		// 最初のアルファ引数(初期値はD3DTA_TEXTURE、テクスチャがない場合はD3DTA_DIFFUSE)
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);		// ２番目のアルファ引数(初期値はD3DTA_CURRENT)
+
 
 #ifdef _DEBUG
 	// デバッグ情報表示用フォントの生成
@@ -123,8 +124,6 @@ HRESULT CRenderer::Init(HWND hWnd, bool bWindow)
 					OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &m_pFont);
 #endif
 
-	// ポリゴンの初期化処理
-	//InitPolygon();
 
 	return S_OK;
 }
@@ -134,8 +133,6 @@ HRESULT CRenderer::Init(HWND hWnd, bool bWindow)
 //=============================================================================
 void CRenderer::Uninit(void)
 {
-	// ポリゴンの終了処理
-	//UninitPolygon();
 
 #ifdef _DEBUG
 	// デバッグ情報表示用フォントの破棄
