@@ -143,46 +143,47 @@ void CPlayer2D::Update(void)
 	//弾との当たり判定
 	if( m_state == STATE_NORMAL)
 	{
-		for( int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
-		{
-			CScene *pScene;
-			pScene = CScene::GetScene( nCntScene);
+		//リストの先頭を取得
+		CScene *pScene = CScene::GetTop();
 		
-			if( pScene != NULL)
+		while( pScene != NULL)
+		{
+			CScene::OBJTYPE type;
+			type = pScene->GetObjType();
+
+			if( type == CScene::OBJTYPE_BULLET_E)
 			{
-				CScene::OBJTYPE type;
-				type = pScene->GetObjType();
+				//座標
+				D3DXVECTOR3 posPlayer, posBullet;
+				posBullet = pScene->GetPosition();
+				posPlayer = this->GetPosition();
 
-				if( type == CScene::OBJTYPE_BULLET_E)
+				//サイズ
+				D3DXVECTOR3 sizePlayer, sizeBullet;
+				sizeBullet = pScene->GetSize();
+				sizePlayer = this->GetSize();
+
+				//当たり判定
+				if(	   posBullet.x > posPlayer.x - sizePlayer.x/2.0f 
+					&& posBullet.x < posPlayer.x + sizePlayer.x/2.0f 
+					&& posBullet.y > posPlayer.y - sizePlayer.y/2.0f  
+					&& posBullet.y < posPlayer.y + sizePlayer.y/2.0f 
+					)
 				{
-					//座標
-					D3DXVECTOR3 posPlayer, posBullet;
-					posBullet = pScene->GetPosition();
-					posPlayer = this->GetPosition();
+					//弾の破棄
+					//((CBullet2D*)pScene)->Uninit();
+					((CBullet2D*)pScene)->SetDelFlg();
 
-					//サイズ
-					D3DXVECTOR3 sizePlayer, sizeBullet;
-					sizeBullet = pScene->GetSize();
-					sizePlayer = this->GetSize();
+					//ダメージ処理
+					this->Hit();
 
-					//当たり判定
-					if(	   posBullet.x > posPlayer.x - sizePlayer.x/2.0f 
-						&& posBullet.x < posPlayer.x + sizePlayer.x/2.0f 
-						&& posBullet.y > posPlayer.y - sizePlayer.y/2.0f  
-						&& posBullet.y < posPlayer.y + sizePlayer.y/2.0f 
-						)
-					{
-						//弾の破棄
-						((CBullet2D*)pScene)->Uninit();
-
-						//ダメージ処理
-						this->Hit();
-
-						//return;
-					}
+					//break;
 				}
 			}
-		}	
+
+			//次のオブジェクトに
+			pScene = pScene->GetNext();
+		}
 	}
 
 

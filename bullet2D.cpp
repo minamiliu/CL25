@@ -103,47 +103,48 @@ void CBullet2D::Update(void)
 	//敵との当たり判定
 	if(this->GetObjType() == CScene::OBJTYPE_BULLET_P)
 	{
-		for( int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
+		//リストの先頭を取得
+		CScene *pScene = CScene::GetTop();
+
+		while( pScene != NULL)
 		{
-			CScene *pScene;
-			pScene = CScene::GetScene( nCntScene);
-		
-			if( pScene != NULL)
+			CScene::OBJTYPE type;
+			type = pScene->GetObjType();
+
+			if( type == CScene::OBJTYPE_ENEMY)
 			{
-				CScene::OBJTYPE type;
-				type = pScene->GetObjType();
+				//座標
+				D3DXVECTOR3 posEnemy, posBullet;
+				posEnemy = pScene->GetPosition();
+				posBullet = this->GetPosition();
 
-				if( type == CScene::OBJTYPE_ENEMY)
+				//サイズ
+				D3DXVECTOR3 sizeEnemy, sizeBullet;
+				sizeEnemy = pScene->GetSize();
+				sizeBullet = this->GetSize();
+
+				//当たり判定
+				if(	   posBullet.x > posEnemy.x - sizeEnemy.x/2.0f 
+					&& posBullet.x < posEnemy.x + sizeEnemy.x/2.0f 
+					&& posBullet.y > posEnemy.y - sizeEnemy.y/2.0f  
+					&& posBullet.y < posEnemy.y + sizeEnemy.y/2.0f 
+					)
 				{
-					//座標
-					D3DXVECTOR3 posEnemy, posBullet;
-					posEnemy = pScene->GetPosition();
-					posBullet = this->GetPosition();
+					((CEnemy2D*)pScene)->Hit( BULLET_DAMAGE);
 
-					//サイズ
-					D3DXVECTOR3 sizeEnemy, sizeBullet;
-					sizeEnemy = pScene->GetSize();
-					sizeBullet = this->GetSize();
+					//弾(自分)の破棄
+					//this->Uninit();
+					this->SetDelFlg();
 
-					//当たり判定
-					if(	   posBullet.x > posEnemy.x - sizeEnemy.x/2.0f 
-						&& posBullet.x < posEnemy.x + sizeEnemy.x/2.0f 
-						&& posBullet.y > posEnemy.y - sizeEnemy.y/2.0f  
-						&& posBullet.y < posEnemy.y + sizeEnemy.y/2.0f 
-						)
-					{
-						((CEnemy2D*)pScene)->Hit( BULLET_DAMAGE);
-
-						//弾(自分)の破棄
-						this->Uninit();
-
-						//スコア
-						CManager::GetScore()->AddScore( 100);
+					//スコア
+					CManager::GetScore()->AddScore( 100);
 					
-						return;
-					}
+					return;
 				}
 			}
+
+			//次のオブジェクトに
+			pScene = pScene->GetNext();
 		}	
 	}
 

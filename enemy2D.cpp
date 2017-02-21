@@ -338,7 +338,8 @@ bool CEnemy2D::Hit(int nDamage)
 		}
 
 		//“G‚Ì”jŠü
-		this->Uninit();
+		//this->Uninit();
+		this->SetDelFlg();
 
 		return true;
 	}

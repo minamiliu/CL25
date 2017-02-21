@@ -13,7 +13,6 @@
 //============================================
 //マクロ定義
 //============================================
-#define MAX_SCENE	(200)
 
 //============================================
 //構造体定義
@@ -51,7 +50,16 @@ public:
 	void SetObjType(OBJTYPE type);
 	OBJTYPE GetObjType(void);
 	
-	static CScene *GetScene(int nIdxScene);
+	static CScene *GetTop(void);
+	static CScene *GetCur(void);
+
+	void LinkList(void);
+	void UnlinkList(void);
+	CScene *GetNext(void);
+	CScene *GetPrev(void);
+	
+	void SetDelFlg(void);
+	static void DeleteAllFlg(void);
 
 protected:
 	
@@ -59,10 +67,14 @@ protected:
 
 private:
 
-	static CScene *m_apScene[MAX_SCENE];
-	static int m_nNumScene;
-	int m_nID;
+	static CScene *m_pTop; //自分の前のオブジェクトのポインター
+	static CScene *m_pCur; //自分の後のオブジェクトのポインター
+
+	CScene *m_pPrev; //リストの先頭のオブジェクトのポインター
+	CScene *m_pNext; //リストの最後尾のオブジェクトのポインター(現在位置)
+
 	OBJTYPE m_objType;
+	bool m_bDelFlg;
 };
 
 #endif

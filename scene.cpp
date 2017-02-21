@@ -16,99 +16,145 @@
 //============================================
 //静的メンバ変数の初期化
 //============================================
-CScene *CScene::m_apScene[MAX_SCENE] = {};
-int CScene::m_nNumScene = 0;
+CScene *CScene::m_pTop = NULL; //自分の前のオブジェクトのポインター
+CScene *CScene::m_pCur = NULL; //自分の後のオブジェクトのポインター
 
 //============================================
 // マクロ定義
 //============================================
 
 
-//============================================
-// 構造体定義
-//============================================
-
-
-//============================================
-//コンストラクタ
-//============================================
+//=============================================================================
+// CSceneコンストラクタ
+//=============================================================================
 CScene::CScene()
 {
-	for(int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
+	// オブジェクトをリストに登録
+	LinkList();
+
+	//死亡フラグの初期化
+	m_bDelFlg = false;
+}
+
+//=============================================================================
+// CSceneデストラクタ
+//=============================================================================
+CScene::~CScene()
+{
+}
+
+//=============================================================================
+// オブジェクトの更新処理
+//=============================================================================
+void CScene::UpdateAll(void)
+{
+	CScene *pScene = m_pTop;
+	while(pScene != NULL)
 	{
-		if(m_apScene[nCntScene] == NULL)
-		{
-			m_apScene[nCntScene] = this;
-			m_nID = nCntScene;
-			m_nNumScene++;
-			break;
-		}
+		CScene *pSceneNext = pScene->m_pNext;
+		pScene->Update();
+		pScene = pSceneNext;
 	}
 }
 
-//============================================
-//デストラクタ
-//============================================
-CScene::~CScene()
-{
-	
-}
-
-//============================================
-//全部のシーン更新
-//============================================
-void CScene::UpdateAll(void)
-{
-	for(int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
-	{
-		if(m_apScene[nCntScene] != NULL)
-		{
-			m_apScene[nCntScene]->Update();
-		}
-	}	
-}
-
-//============================================
-//全部のシーン描画
-//============================================
+//=============================================================================
+// オブジェクトの描画処理
+//=============================================================================
 void CScene::DrawAll(void)
 {
-	for(int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
+	CScene *pScene = m_pTop;
+	while(pScene != NULL)
 	{
-		if(m_apScene[nCntScene] != NULL)
-		{
-			m_apScene[nCntScene]->Draw();
-		}
-	}	
+		CScene *pSceneNext = pScene->m_pNext;
+		pScene->Draw();
+		pScene = pSceneNext;
+	}
 }
 
-//============================================
-//全部のシーン開放
-//============================================
+//=============================================================================
+// オブジェクトを全て破棄
+//=============================================================================
 void CScene::ReleaseAll(void)
 {
-	for(int nCntScene = 0; nCntScene < MAX_SCENE; nCntScene++)
+	CScene *pScene = m_pTop;
+	while(pScene != NULL)
 	{
-		if(m_apScene[nCntScene] != NULL)
-		{
-			m_apScene[nCntScene]->Uninit();
-		}
-	}	
+		CScene *pSceneNext = pScene->m_pNext;
+		pScene->Uninit();
+		pScene = pSceneNext;
+	}
+	m_pTop = NULL;
+	m_pCur = NULL;
 }
 
-//============================================
-//自我開放
-//============================================
+//=============================================================================
+// オブジェクトを破棄
+//=============================================================================
 void CScene::Release(void)
 {
-	if(m_apScene[m_nID] != NULL)
-	{
-		int nID = m_nID;
-		delete m_apScene[nID];
-		m_apScene[nID] = NULL;
-		m_nNumScene--;
-	}	
+	// オブジェクトをリストから削除
+	UnlinkList();
+
+	// 自分を破棄
+	delete this;
 }
+
+//=============================================================================
+// オブジェクトをリストに登録
+//=============================================================================
+void CScene::LinkList(void)
+{
+	m_pPrev = NULL;
+	m_pNext = NULL;
+
+	if(m_pTop == NULL)
+	{
+		m_pTop = this;
+	}
+
+	if( m_pCur == NULL)
+	{
+		m_pCur = this;
+	}
+	else
+	{
+		m_pCur->m_pNext = this;
+		this->m_pPrev = m_pCur;
+		m_pCur = this;
+	}
+}
+
+//=============================================================================
+// オブジェクトをリストから削除
+//=============================================================================
+void CScene::UnlinkList(void)
+{
+	// オブジェクトをリストから削除
+	if(this->m_pPrev != NULL)
+	{
+		CScene *pScenePrev = this->m_pPrev;
+		pScenePrev->m_pNext = this->m_pNext;
+	}
+
+
+	if(this->m_pNext != NULL)
+	{
+		CScene *pSceneNext = this->m_pNext;
+		pSceneNext->m_pPrev = this->m_pPrev;
+	}
+
+	if(m_pCur == this)
+	{
+		m_pCur = this->m_pPrev;
+	}
+
+	if(m_pTop == this)
+	{
+		m_pTop = NULL;
+	}
+}
+
+
 
 //============================================
 //オブジェクトを設定
@@ -127,9 +173,58 @@ CScene::OBJTYPE CScene::GetObjType(void)
 }
 
 //============================================
-//オブジェクトのIDを取得
+//リストの先頭を取得
 //============================================
-CScene *CScene::GetScene(int nIdxScene)
+CScene *CScene::GetTop(void)
 {
-	return m_apScene[nIdxScene];
+	return m_pTop;
+}
+
+//============================================
+//リストの最後尾を取得
+//============================================
+CScene *CScene::GetCur(void)
+{
+	return m_pCur;
+}
+
+//============================================
+//次のオブジェクトのポインタを取得
+//============================================
+CScene *CScene::GetNext(void)
+{
+	return this->m_pNext;
+}
+
+//============================================
+//前のオブジェクトのポインタを取得
+//============================================
+CScene *CScene::GetPrev(void)
+{
+	return this->m_pPrev;
+}
+
+//============================================
+//死亡フラグを立てる
+//============================================
+void CScene::SetDelFlg(void)
+{
+	m_bDelFlg = true;
+}
+
+//============================================
+//死亡フラグが立ったオブジェクトを削除する
+//============================================
+void CScene::DeleteAllFlg(void)
+{
+	CScene *pScene = m_pTop;
+	while(pScene != NULL)
+	{
+		CScene *pSceneNext = pScene->m_pNext;
+		if(pScene->m_bDelFlg == true)
+		{
+			pScene->Uninit();
+		}
+		pScene = pSceneNext;
+	}
 }
